@@ -149,18 +149,27 @@ enforce the billing information as well. This can be accomplished via:
 Configuring SpreedlyCore with Rails
 ----------
 
-Inside your rails project create config/spreedly_core.yml with the following:
+Inside your Rails project create config/spreedly_core.yml formatted like config/database.yml. For example:
 
-    login: <Login Key>
-    secret: <Secret Key>
-    gateway_token: 'JncEWj22g59t3CRB1VnPXmUUgKc' # this is the test gateway, replace with your real gateway in production
+    development:
+      login: <Login Key>
+      secret: <Secret Key>
+      gateway_token: 'JncEWj22g59t3CRB1VnPXmUUgKc' # this is the test gateway, replace with your real gateway in production
+    test:
+      login: <Login Key>
+      secret: <Secret Key>
+      gateway_token: 'JncEWj22g59t3CRB1VnPXmUUgKc' # this is the test gateway, replace with your real gateway in production
+    production:
+      login: <Login Key>
+      secret: <Secret Key>
+      gateway_token: 'JncEWj22g59t3CRB1VnPXmUUgKc' # this is the test gateway, replace with your real gateway in production
 
-Then inside config/initializers/spreedly_core.rb add the following:
+Then create config/initializers/spreedly_core.rb with the following:
 
-    config = YAML.load(File.read(RAILS_ROOT + '/config/spreedly_core.yml'))
+    config = YAML.load(File.read(RAILS_ROOT + '/config/spreedly_core.yml'))[RAILS_ENV]
     SpreedlyCore.configure(config['login'], config['secret'], config['gateway_token'])
 
-Optional require additional credit card fields:
+Optionally require additional credit card fields:
 
     SpreedlyCore::PaymentMethod.additional_required_cc_fields :address1, :city, :state, :zip  
 
