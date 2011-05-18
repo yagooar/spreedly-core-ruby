@@ -3,6 +3,15 @@ SpreedlyCore
 
 SpreedlyCore is a Ruby library for accessing the [Spreedly Core API](https://spreedlycore.com/).
 
+The beauty behind Spreedly Core is that you lower your
+[PCI Compliance](https://www.pcisecuritystandards.org/) risk 
+by storing credit card information on their service while still having access
+to make payments and credits. This is possible by having your customers POST their
+credit card info to the spreedly core service while embedding a transparent
+redirect URL back to your application. See "Submit payment form" on
+[the quick start guide](https://spreedlycore.com/manual/quickstart)
+how the magic happens..
+
 
 Quickstart
 ----------
@@ -14,20 +23,14 @@ RubyGems:
     require 'rubygems'
     require 'spreedly_core'
     SpreedlyCore.configure("Your API Login", "Your API Secret", "Test Gateway Token")
-[Quickstart guide has info about gateway tokens](https://spreedlycore.com/manual/quickstart)
+See the [quickstart guide](https://spreedlycore.com/manual/quickstart) for
+information regarding tokens.
 
+We'll now lookup the payment method stored on SpreedlyCore using token param
+from the transparent redirect url
+ 
     payment_token = SpreedlyCore::PaymentMethod.find(payment_token)
     transaction = payment_token.purchase(100)
-
-
-The beauty behind Spreedly Core is that you lower your PCI Compliance risk
-by storing credit card information on their service while still having access
-to make payments and credits. This is possible by having your customers POST their
-credit card info to the spreedly core service while embedding a transparent
-redirect URL back to your application. See "Submit payment form" on
-[the quick start guide](https://spreedlycore.com/manual/quickstart)
-for more info.
-
 
 Test Integration
 ----------
@@ -38,10 +41,13 @@ integration testing can be a bit of a headache. No worries though:
     require 'spreedly_core'
     require 'spreedly_core/test_extensions'
     SpreedlyCore.configure("Your API Login", "Your API Secret", "Test Gateway Token")
-    master_card_data = SpreedlyCore::TestHelper.cc_data(:master) # Lookup test credit cared data
+    master_card_data = SpreedlyCore::TestHelper.cc_data(:master) # Lookup test credit card data
     token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
 
-You now have access to a payment method token, which can be used just like your application would use it. Note, you should use a test gateway since you are actually hitting the Spreedly Core service. Let's use the test credit card payment method to make a purchase:
+You now have access to a payment method token, which can be used just like your
+application would use it. Note, you should use a test gateway since you are
+actually hitting the Spreedly Core service. Let's use the test credit card
+payment method to make a purchase:
     
     payment_method = SpreedlyCore::PaymentMethod.find(token)
     purchase_transaction = payment_method.purchase(100)
@@ -69,11 +75,11 @@ Using spreedly_core in irb:
     token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
 
 
-Looking up a payment method:
+Look up a payment method:
 
     payment_method = SpreedlyCore::PaymentMethod.find(token)
 
-Retaining a payment method to be used for later use:
+Retain a payment method for later use:
 
     retain_transaction = payment_method.retain
     retain_transaction.succeeded? # true
@@ -121,7 +127,9 @@ Additional Field Validation
 ----------
 
 
-The Spreedyly Core API provides validation of the credit card number, cve, and first and last name. Sometimes you want to enforce the billing information as well. This can be accomplished via:
+The Spreedyly Core API provides validation of the credit card number, cve, and
+first and last name. In most cases this is enough, however sometimes you want to
+enforce the billing information as well. This can be accomplished via:
 
     require 'spreedly_core'
     require 'spreedly_core/test_extensions'
@@ -145,7 +153,7 @@ Inside your rails project create config/spreedly_core.yml with the following:
 
     login: <Login Key>
     secret: <Secret Key>
-    gateway_token: 'JncEWj22g59t3CRB1VnPXmUUgKc' # test gateway
+    gateway_token: 'JncEWj22g59t3CRB1VnPXmUUgKc' # this is the test gateway, replace with your real gateway in production
 
 Then inside config/initializers/spreedly_core.rb add the following:
 
