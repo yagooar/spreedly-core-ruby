@@ -10,7 +10,7 @@ to make payments and credits. This is possible by having your customers POST the
 credit card info to the spreedly core service while embedding a transparent
 redirect URL back to your application. See "Submit payment form" on
 [the quick start guide](https://spreedlycore.com/manual/quickstart)
-how the magic happens..
+how the magic happens.
 
 
 Quickstart
