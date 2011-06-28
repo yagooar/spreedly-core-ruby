@@ -103,7 +103,8 @@ class SpreedlyCoreTest < Test::Unit::TestCase
 
 
   def test_can_get_payment_token
-    payment_method = given_a_payment_method
+    payment_method = given_a_payment_method(:master,
+                                            :credit_card => {:year => 2015})
     assert_equal "John", payment_method.first_name
     assert_equal "Foo", payment_method.last_name
     assert_equal "XXX", payment_method.verification_value
