@@ -1,2 +1,4 @@
 test/config/spreedly_core.yml
 *.gem
+.rbenv-*
+

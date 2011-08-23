@@ -12,6 +12,7 @@ GEM
     httparty (0.7.7)
       crack (= 0.1.8)
     linecache (0.43)
+    rake (0.8.7)
     ruby-debug (0.10.4)
       columnize (>= 0.1)
       ruby-debug-base (~> 0.10.4.0)
@@ -22,5 +23,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  rake (= 0.8.7)
   ruby-debug
   spreedly_core!
