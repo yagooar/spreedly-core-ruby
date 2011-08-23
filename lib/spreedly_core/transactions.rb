@@ -68,7 +68,7 @@ module SpreedlyCore
   end
 
   class AuthorizeTransaction < Transaction
-    handles "authorization"
+    handles "Authorization"
     attr_reader :payment_method
     
     def initialize(attrs={})
@@ -97,7 +97,7 @@ module SpreedlyCore
   class PurchaseTransaction < Transaction
     include NullifiableTransaction
 
-    handles "purchase"
+    handles "Purchase"
     attr_reader :payment_method
 
     def initialize(attrs={})
@@ -110,17 +110,17 @@ module SpreedlyCore
   class CaptureTransaction < Transaction
     include NullifiableTransaction
 
-    handles "capture"
+    handles "Capture"
     attr_reader :reference_token
   end
 
   class VoidedTransaction < Transaction
-    handles "void"
+    handles "Void"
     attr_reader :reference_token
   end
 
   class CreditTransaction < Transaction
-    handles "credit"
+    handles "Credit"
     attr_reader :reference_token
   end
   

@@ -23,7 +23,7 @@ class SpreedlyCoreTest < Test::Unit::TestCase
     assert transaction = payment_method.purchase(purchase_amount)
     assert_equal purchase_amount, transaction.amount
     assert_equal "USD", transaction.currency_code
-    assert_equal "purchase", transaction.transaction_type
+    assert_equal "Purchase", transaction.transaction_type
     assert transaction.succeeded?
     transaction
   end
@@ -60,7 +60,7 @@ class SpreedlyCoreTest < Test::Unit::TestCase
     capture = transaction.capture(amount)
     assert capture.succeeded?
     assert_equal amount, capture.amount
-    assert_equal "capture", capture.transaction_type
+    assert_equal "Capture", capture.transaction_type
     assert_equal SpreedlyCore::CaptureTransaction, capture.class
     capture
   end
