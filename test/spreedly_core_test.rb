@@ -18,12 +18,13 @@ class SpreedlyCoreTest < Test::Unit::TestCase
     payment_method
   end
 
-  def given_a_purchase(purchase_amount=100)
+  def given_a_purchase(purchase_amount=100, ip_address='127.0.0.1')
     payment_method = given_a_payment_method
-    assert transaction = payment_method.purchase(purchase_amount)
+    assert transaction = payment_method.purchase(purchase_amount, nil, nil, ip_address=nil)
     assert_equal purchase_amount, transaction.amount
     assert_equal "USD", transaction.currency_code
     assert_equal "Purchase", transaction.transaction_type
+    assert_equal ip_address, transaction.ip
     assert transaction.succeeded?
     transaction
   end
@@ -46,55 +47,60 @@ class SpreedlyCoreTest < Test::Unit::TestCase
     transaction
   end
 
-  def given_an_authorized_transaction(amount=100)
+  def given_an_authorized_transaction(amount=100, ip_address='127.0.0.1')
     payment_method = given_a_payment_method
-    assert transaction = payment_method.authorize(100)
+    assert transaction = payment_method.authorize(100, nil, nil, ip_address)
     assert_equal 100, transaction.amount
     assert_equal "USD", transaction.currency_code
+    assert_equal ip_address, transaction.ip
     assert_equal SpreedlyCore::AuthorizeTransaction, transaction.class
     transaction
   end
   
-  def given_a_capture(amount=100)
-    transaction = given_an_authorized_transaction
-    capture = transaction.capture(amount)
+  def given_a_capture(amount=100, ip_address='127.0.0.1')
+    transaction = given_an_authorized_transaction(amount, ip_address)
+    capture = transaction.capture(amount, ip_address)
     assert capture.succeeded?
     assert_equal amount, capture.amount
     assert_equal "Capture", capture.transaction_type
+    assert_equal ip_address, capture.ip
     assert_equal SpreedlyCore::CaptureTransaction, capture.class
     capture
   end
 
-  def given_a_purchase_void
+  def given_a_purchase_void(ip_address='127.0.0.1')
     purchase = given_a_purchase
-    assert void = purchase.void
+    assert void = purchase.void(ip_address)
     assert_equal purchase.token, void.reference_token
+    assert_equal ip_address, void.ip
     assert void.succeeded?
     void
   end
 
-  def given_a_capture_void
+  def given_a_capture_void(ip_address='127.0.0.1')
     capture = given_a_capture
-    assert void = capture.void
+    assert void = capture.void(ip_address)
     assert_equal capture.token, void.reference_token
+    assert_equal ip_address, void.ip
     assert void.succeeded?
     void
   end
 
-  def given_a_purchase_credit(purchase_amount=100, credit_amount=100)
-    purchase = given_a_purchase(purchase_amount)
-    given_a_credit(purchase, credit_amount)
+  def given_a_purchase_credit(purchase_amount=100, credit_amount=100, ip_address='127.0.0.1')
+    purchase = given_a_purchase(purchase_amount, ip_address)
+    given_a_credit(purchase, credit_amount, ip_address)
   end
 
-  def given_a_capture_credit(capture_amount=100, credit_amount=100)
-    capture = given_a_capture(capture_amount)
-    given_a_credit(capture, credit_amount)
+  def given_a_capture_credit(capture_amount=100, credit_amount=100, ip_address='127.0.0.1')
+    capture = given_a_capture(capture_amount, ip_address)
+    given_a_credit(capture, credit_amount, ip_address)
   end
 
-  def given_a_credit(trans, credit_amount=100)
-    assert credit = trans.credit(credit_amount)
+  def given_a_credit(trans, credit_amount=100, ip_address='127.0.0.1')
+    assert credit = trans.credit(credit_amount, ip_address)
     assert_equal trans.token, credit.reference_token
     assert_equal credit_amount, credit.amount
+    assert_equal ip_address, credit.ip
     assert credit.succeeded?
     assert SpreedlyCore::CreditTransaction, credit.class
     credit

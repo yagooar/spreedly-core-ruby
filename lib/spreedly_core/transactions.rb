@@ -46,19 +46,21 @@ module SpreedlyCore
   module NullifiableTransaction
     # Void is used to cancel out authorizations and, with some gateways, to
     # cancel actual payment transactions within the first 24 hours
-    def void
-      self.class.verify_post("/transactions/#{token}/void.xml") do |response|
+    def void(ip_address=nil)
+      body = {:transaction => {:ip => ip_address}}
+      self.class.verify_post("/transactions/#{token}/void.xml",
+                             :body => body) do |response|
         VoidedTransaction.new(response.parsed_response["transaction"])
       end      
     end
 
     # Credit amount. If amount is nil, then credit the entire previous purchase
     # or captured amount 
-    def credit(amount=nil)
+    def credit(amount=nil, ip_address=nil)
       body = if amount.nil? 
-               {}
+               {:ip => ip_address}
              else
-               {:transaction => {:amount => amount}}
+               {:transaction => {:amount => amount, :ip => ip_address}}
              end
       self.class.verify_post("/transactions/#{token}/credit.xml",
                              :body => body) do |response|
@@ -67,7 +69,13 @@ module SpreedlyCore
     end
   end
 
+  module HasIpAddress
+    attr_reader :ip
+  end
+
   class AuthorizeTransaction < Transaction
+    include HasIpAddress
+    
     handles "Authorization"
     attr_reader :payment_method
     
@@ -81,11 +89,11 @@ module SpreedlyCore
     # captured amount will the amount from the original authorization. Some
     # gateways support partial captures which can be done by specifiying an
     # amount
-    def capture(amount=nil)
+    def capture(amount=nil, ip_address=nil)
       body = if amount.nil?
                {}
              else
-               {:transaction => {:amount => amount}}
+               {:transaction => {:amount => amount, :ip => ip_address}}
              end
       self.class.verify_post("/transactions/#{token}/capture.xml",
                             :body => body) do |response|
@@ -96,6 +104,7 @@ module SpreedlyCore
 
   class PurchaseTransaction < Transaction
     include NullifiableTransaction
+    include HasIpAddress
 
     handles "Purchase"
     attr_reader :payment_method
@@ -109,17 +118,22 @@ module SpreedlyCore
 
   class CaptureTransaction < Transaction
     include NullifiableTransaction
-
+    include HasIpAddress
+    
     handles "Capture"
     attr_reader :reference_token
   end
 
   class VoidedTransaction < Transaction
+    include HasIpAddress
+    
     handles "Void"
     attr_reader :reference_token
   end
 
   class CreditTransaction < Transaction
+    include HasIpAddress
+    
     handles "Credit"
     attr_reader :reference_token
   end

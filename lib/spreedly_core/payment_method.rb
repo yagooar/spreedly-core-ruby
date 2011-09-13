@@ -45,13 +45,13 @@ module SpreedlyCore
     end
 
     # Make a purchase against the payment method
-    def purchase(amount, currency="USD", _gateway_token=nil)
-      purchase_or_authorize(:purchase, amount, currency, _gateway_token)
+    def purchase(amount, currency=nil, _gateway_token=nil, ip_address=nil)
+      purchase_or_authorize(:purchase, amount, currency, _gateway_token, ip_address)
     end
 
     # Make an authorize against payment method. You can then later capture against the authorize
-    def authorize(amount, currency="USD",  _gateway_token=nil)
-      purchase_or_authorize(:authorize, amount, currency, _gateway_token)
+    def authorize(amount, currency=nil,  _gateway_token=nil, ip_address=nil)
+      purchase_or_authorize(:authorize, amount, currency, _gateway_token, ip_address)
     end
 
     # Returns the URL that CC data should be submitted to.
@@ -85,18 +85,22 @@ module SpreedlyCore
       @errors = @errors.sort
     end
 
-    def purchase_or_authorize(tran_type, amount, currency, _gateway_token)
+    def purchase_or_authorize(tran_type, amount, currency, _gateway_token, ip_address)
       transaction_type = tran_type.to_s
       raise "Unknown transaction type" unless %w{purchase authorize}.include?(transaction_type)
 
+      currency ||= "USD"
       _gateway_token ||= self.class.gateway_token
       path = "/gateways/#{_gateway_token}/#{transaction_type}.xml"
-      data = {:transaction => {
-          :amount => amount,
+      data = {
+        :transaction => {
           :transaction_type => transaction_type, 
           :payment_method_token => token,
-          :currency_code => currency }}
-
+          :amount => amount,
+          :currency_code => currency,
+          :ip => ip_address
+        }
+      }
       self.class.verify_post(path, :body => data) do |response|
         klass = SpreedlyCore.const_get("#{transaction_type.capitalize}Transaction")
         klass.new(response.parsed_response["transaction"])
