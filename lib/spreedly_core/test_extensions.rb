@@ -28,9 +28,14 @@ end
 
 module SpreedlyCore
   class PaymentMethod
-    def self.create_test_token(cc_data={})
+
+    # Call spreedly core to create a test token.
+    # pass_through_data will be added as the "data" field.
+    # 
+    def self.create_test_token(cc_data={}, pass_through_data=nil)
       data = cc_data.merge(:redirect_url => "http://example.com",
-                           :api_login => SpreedlyCore::Base.login)
+                           :api_login => SpreedlyCore::Base.login,
+                           :data => pass_through_data)
       
       response = self.post("/payment_methods", :body => data, :no_follow => true)
     rescue HTTParty::RedirectionTooDeep => e
