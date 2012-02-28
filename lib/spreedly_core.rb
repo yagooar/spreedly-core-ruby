@@ -21,7 +21,25 @@ module SpreedlyCore
   class TimeOutError < RuntimeError; end
 
   # Configure SpreedlyCore with a particular account and default gateway
-  def self.configure(login, secret, gateway_token)
+  # If the first argume is a hash, 'login', 'secret', and 'gateway_token'
+  # keys are expected. Otherwise *args is expected to be login, secret,
+  # and gateway_token
+  def self.configure(*args)
+    login_or_hash, secret, gateway_token, *rest = args
+    if login_or_hash.is_a?(Hash)
+
+      # convert symbols to strings
+      login_or_hash.each{|k,v| login_or_hash[k.to_s] = v }
+
+      login = login_or_hash['login']
+      secret = login_or_hash['secret']
+      gateway_token = login_or_hash['gateway_token']
+    else
+      login = login_or_hash
+    end
+    if login.nil? || secret.nil? || gateway_token.nil?
+      raise ArgumentError.new("You must provide a login, secret, and gateway_token")
+    end
     Base.configure(login, secret, gateway_token)
   end
 

@@ -108,8 +108,25 @@ class SpreedlyCoreTest < Test::Unit::TestCase
     credit
   end
 
+  def test_configure
+    SpreedlyCore.configure(:login => "test", :secret => "secret",
+                           :gateway_token => "token")
 
+    SpreedlyCore.configure('login' => 'test', 'secret' => 'secret',
+                           'gateway_token' => 'token')
 
+    SpreedlyCore.configure('test', 'secret', 'token')
+
+    assert_raises ArgumentError do
+      SpreedlyCore.configure
+    end
+
+    assert_raises ArgumentError do
+      SpreedlyCore.configure({})
+    end
+
+  end
+  
   def test_can_get_payment_token
     payment_method = given_a_payment_method(:master,
                                             :credit_card => {:year => 2015})
