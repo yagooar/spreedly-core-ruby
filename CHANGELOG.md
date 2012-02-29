@@ -1,3 +1,9 @@
+0.1.1 / February 29, 2012
+----------
+
+* Update Rakefile to include bundler tasks for building and releasing the gem
+
+
 0.1.0 / February 29, 2012
 ----------
 
