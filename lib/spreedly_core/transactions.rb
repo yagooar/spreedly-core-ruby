@@ -16,7 +16,7 @@ module SpreedlyCore
     # Lookup the transaction by its token. Returns the correct subclass
     def self.find(token)
       return nil if token.nil? 
-      verify_get("/transactions/#{token}.xml") do |response|
+      verify_get("/transactions/#{token}.xml", :has_key => "transaction") do |response|
         attrs = response.parsed_response["transaction"]
         klass = @@transaction_type_to_class[attrs["transaction_type"]] || self
         klass.new(attrs)
@@ -33,6 +33,7 @@ module SpreedlyCore
       super(attrs)
     end
   end
+  
   class RedactTransaction < Transaction
     handles "RedactPaymentMethod"
     attr_reader :payment_method
@@ -49,7 +50,7 @@ module SpreedlyCore
     def void(ip_address=nil)
       body = {:transaction => {:ip => ip_address}}
       self.class.verify_post("/transactions/#{token}/void.xml",
-                             :body => body) do |response|
+                             :body => body, :has_key => "transaction") do |response|
         VoidedTransaction.new(response.parsed_response["transaction"])
       end      
     end
@@ -63,7 +64,7 @@ module SpreedlyCore
                {:transaction => {:amount => amount, :ip => ip_address}}
              end
       self.class.verify_post("/transactions/#{token}/credit.xml",
-                             :body => body) do |response|
+                             :body => body, :has_key => "transaction") do |response|
         CreditTransaction.new(response.parsed_response["transaction"])
       end
     end
@@ -96,7 +97,7 @@ module SpreedlyCore
                {:transaction => {:amount => amount, :ip => ip_address}}
              end
       self.class.verify_post("/transactions/#{token}/capture.xml",
-                            :body => body) do |response|
+                            :body => body, :has_key => "transaction") do |response|
         CaptureTransaction.new(response.parsed_response["transaction"])
       end
     end

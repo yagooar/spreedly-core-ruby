@@ -59,16 +59,16 @@ module SpreedlyCore
         raise TimeOutError.new("Request to #{path} timed out. Is Spreedly Core down?")
       end
         
-      if allowed_codes.any?
-        if allowed_codes.include?(response.code)
-          block.call(response)
-        else
-          raise "Error retrieving #{path}. Got status of #{response.code}. Expected status to be in #{allowed_codes.join(",")}\n#{response.body}"
-        end
-      else
-        block.call(response).tap do |obj|
-          obj.instance_variable_set("@http_code", response.code)
-        end
+      if allowed_codes.any? && !allowed_codes.include?(response.code)
+        raise InvalidResponse.new(response, "Error retrieving #{path}. Got status of #{response.code}. Expected status to be in #{allowed_codes.join(",")}")
+      end
+
+      if options.has_key?(:has_key) && !response.parsed_response.has_key?(options[:has_key])
+        raise InvalidResponse.new(response, "Expected parsed response to contain key '#{options[:has_key]}'")
+      end
+
+      block.call(response).tap do |obj|
+        obj.instance_variable_set("@http_code", response.code)
       end
     end
 

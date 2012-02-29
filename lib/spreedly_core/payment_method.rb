@@ -19,7 +19,8 @@ module SpreedlyCore
     # Lookup the PaymentMethod by token
     def self.find(token)
       return nil if token.nil? 
-      verify_get("/payment_methods/#{token}.xml") do |response|
+      verify_get("/payment_methods/#{token}.xml",
+                 :has_key => "payment_method") do |response|
         new(response.parsed_response["payment_method"])
       end
     end
@@ -32,14 +33,16 @@ module SpreedlyCore
 
     # Retain the payment method
     def retain
-      self.class.verify_put("/payment_methods/#{token}/retain.xml", :body => {}) do |response|
+      self.class.verify_put("/payment_methods/#{token}/retain.xml",
+                            :body => {}, :has_key => "transaction") do |response|
         RetainTransaction.new(response.parsed_response["transaction"])
       end
     end
 
     # Redact the payment method
     def redact
-      self.class.verify_put("/payment_methods/#{token}/redact.xml", :body => {}) do |response|
+      self.class.verify_put("/payment_methods/#{token}/redact.xml",
+                            :body => {}, :has_key => "transaction") do |response|
         RedactTransaction.new(response.parsed_response["transaction"])
       end
     end
@@ -101,7 +104,8 @@ module SpreedlyCore
           :ip => ip_address
         }
       }
-      self.class.verify_post(path, :body => data) do |response|
+      self.class.verify_post(path, :body => data,
+                             :has_key => "transaction") do |response|
         klass = SpreedlyCore.const_get("#{transaction_type.capitalize}Transaction")
         klass.new(response.parsed_response["transaction"])
       end

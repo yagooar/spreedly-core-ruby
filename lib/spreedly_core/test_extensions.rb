@@ -40,11 +40,11 @@ module SpreedlyCore
       response = self.post("/payment_methods", :body => data, :no_follow => true)
     rescue HTTParty::RedirectionTooDeep => e
       if e.response.body =~ /href="(.*?)"/
-        # rescuing the redirection too deep is apparently the way to
+        # rescuing the RedirectionTooDeep exception is apparently the way to
         # handle redirect following
         token = CGI::parse(URI.parse($1).query)["token"].first
       end
-      raise "Could not find token in body: #{response}" if token.nil?
+      raise "Could not find token in body: #{e.response.body}" if token.nil?
       return token
     end
   end

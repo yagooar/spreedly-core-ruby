@@ -10,8 +10,10 @@ Bundler.require(:default, :development)
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'spreedly_core'
 require 'spreedly_core/test_extensions'
+require 'test_factory'
 
-
-config = YAML.load(File.read(File.dirname(__FILE__) + '/config/spreedly_core.yml'))
-SpreedlyCore.configure(config['login'], config['secret'], config['gateway_token'])
-
+class Test::Unit::TestCase
+  def assert_false(test, failure_message=nil)
+    assert(!test, failure_message)
+  end
+end

@@ -16,9 +16,15 @@ module SpreedlyCore
     "Discover" => "discover"
   }
 
+  class Error < RuntimeError; end
   # Custom exception which occurs when a request to SpreedlyCore times out
   # See SpreedlyCore::Base.default_timeout 
-  class TimeOutError < RuntimeError; end
+  class TimeOutError < Error; end
+  class InvalidResponse < Error
+    def initialize(response, message)
+      super("#{message}\nResponse:\n#{response.inspect}")
+    end
+  end
 
   # Configure SpreedlyCore with a particular account and default gateway
   # If the first argume is a hash, 'login', 'secret', and 'gateway_token'
