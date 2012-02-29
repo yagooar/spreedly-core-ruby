@@ -63,7 +63,8 @@ module SpreedlyCore
         raise InvalidResponse.new(response, "Error retrieving #{path}. Got status of #{response.code}. Expected status to be in #{allowed_codes.join(",")}")
       end
 
-      if options.has_key?(:has_key) && !response.parsed_response.has_key?(options[:has_key])
+      if options.has_key?(:has_key) &&
+          (response.parsed_response.nil? || !response.parsed_response.has_key?(options[:has_key]))
         raise InvalidResponse.new(response, "Expected parsed response to contain key '#{options[:has_key]}'")
       end
 

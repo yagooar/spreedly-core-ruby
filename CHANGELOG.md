@@ -1,3 +1,9 @@
+0.1.2 / February 29, 2012
+----------
+
+* Fix bug where a response with no body could raise a NoMethodError on NilClass
+
+
 0.1.1 / February 29, 2012
 ----------
 

@@ -15,6 +15,16 @@ module SpreedlyCore
       PaymentMethod.reset_additional_required_cc_fields
     end
 
+    def test_mocked_500_error
+      with_disabled_network do
+        stub_request(:put, "#{mocked_base_uri_string}/payment_methods/FAKE.xml").
+          to_return(:body => '', :status => 500)
+        assert_raises InvalidResponse do
+          Base.verify_put('/payment_methods/FAKE.xml', :has_key => "test") {}
+        end
+      end
+    end
+
     def test_can_get_payment_token
       payment_method = given_a_payment_method(:master,
                                               :credit_card => {:year => 2015})
