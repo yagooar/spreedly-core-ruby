@@ -26,8 +26,8 @@ RubyGems:
 See the [quickstart guide](https://spreedlycore.com/manual/quickstart) for
 information regarding tokens.
 
-We'll now lookup the payment method stored on SpreedlyCore using token param
-from the transparent redirect url
+We'll now look up the payment method stored on SpreedlyCore using token param
+from the transparent redirect URL
  
     payment_token = SpreedlyCore::PaymentMethod.find(payment_token)
     transaction = payment_token.purchase(100)
@@ -71,6 +71,9 @@ Using spreedly_core in irb:
     require 'spreedly_core'
     require 'spreedly_core/test_extensions' # allow creating payment methods from the command line
     SpreedlyCore.configure("Your API Login", "Your API Secret", "Test Gateway Token")
+    # or if loading from YAML for example, configure takes a hash as well
+    SpreedlyCore.configure(:login => "Your API Login", :secret => "Your API Secret",
+                           :token => "Test Gateway Token")       
     master_card_data = SpreedlyCore::TestHelper.cc_data(:master)
     token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
 
@@ -122,12 +125,36 @@ Credit part of a previous purchase:
     purchase_transaction.credit(50) # provide a partial credit
     purchase_transaction.succeeded? # true 
 
+Handling Exceptions:
+
+There are 2 types of exceptions which can be raised by the library:
+
+  1.  SpreedlyCore::TimeOutError is raised if communication with SpreedlyCore
+      takes longer than 10 seconds     
+  2.  SpreedlyCore::InvalidResponse is raised when the response code is
+      unexpected (I.E. we expect a HTTP response code of 200 bunt instead got a
+      500) or if the response does not contain an expected attribute. For
+      example, the response from retaining a payment method should contain an XML
+      attribute of "transaction". If this is not found (for example a HTTP
+      response 404 or 500 is returned), then an InvalidResponse is raised.
+
+      
+Both TimeOutError and InvalidResponse subclass SpreedlyCore::Error.
+
+Look up a payment method that does not exist:
+
+    begin
+      payment_method = SpreedlyCore::PaymentMethod.find("NOT-FOUND")
+    rescue SpreedlyCore::InvalidResponse => e
+      puts e.inspect
+    end  
+
    
 Additional Field Validation
 ----------
 
 
-The Spreedyly Core API provides validation of the credit card number, cve, and
+The Spreedyly Core API provides validation of the credit card number, CVE, and
 first and last name. In most cases this is enough, however sometimes you want to
 enforce the billing information as well. This can be accomplished via:
 
@@ -167,7 +194,7 @@ Inside your Rails project create config/spreedly_core.yml formatted like config/
 Then create config/initializers/spreedly_core.rb with the following:
 
     config = YAML.load(File.read(RAILS_ROOT + '/config/spreedly_core.yml'))[RAILS_ENV]
-    SpreedlyCore.configure(config['login'], config['secret'], config['gateway_token'])
+    SpreedlyCore.configure(config)
 
 Optionally require additional credit card fields:
 
