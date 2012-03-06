@@ -26,27 +26,26 @@ module SpreedlyCore
     end
   end
 
-  # Configure SpreedlyCore with a particular account and default gateway
-  # If the first argume is a hash, 'login', 'secret', and 'gateway_token'
-  # keys are expected. Otherwise *args is expected to be login, secret,
-  # and gateway_token
-  def self.configure(*args)
-    login_or_hash, secret, gateway_token, *rest = args
-    if login_or_hash.is_a?(Hash)
+  # Configure SpreedlyCore with a particular account.
+  # Strongly prefers environment variables for credentials
+  # and will issue a stern warning should they not be present.
+  # Reluctantly accepts :login and :secret as options
+  def self.configure(options = {})
+    login = ENV['SPREEDLYCORE_API_LOGIN']
+    secret = ENV['SPREEDLYCORE_API_SECRET']
 
-      # convert symbols to strings
-      login_or_hash.each{|k,v| login_or_hash[k.to_s] = v }
+    unless login && secret
+      Kernel.warn("It is STRONGLY preferred that you house your Spreedly Core credentials in environment variables.")
+      Kernal.warn("This gem is expecting variables named SPREEDLYCORE_API_LOGIN and SPREEDLYCORE_API_SECRET.")
+    end
 
-      login = login_or_hash['login']
-      secret = login_or_hash['secret']
-      gateway_token = login_or_hash['gateway_token']
-    else
-      login = login_or_hash
+    login ||= options[:login]
+    secret ||= options[:secret]
+
+    if login.nil? || secret.nil?
+      raise ArgumentError.new("You must provide a login and a secret. Gem will look for ENV['SPREEDLYCORE_API_LOGIN'] and ENV['SPREEDLYCORE_API_SECRET'], but you may also pass in a hash with :login and :secret keys.")
     end
-    if login.nil? || secret.nil? || gateway_token.nil?
-      raise ArgumentError.new("You must provide a login, secret, and gateway_token")
-    end
-    Base.configure(login, secret, gateway_token)
+    Base.configure(login, secret)
   end
 
   # returns the configured SpreedlyCore login
