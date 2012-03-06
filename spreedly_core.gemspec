@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.summary           = "Ruby API for Spreedly Core"
   s.homepage          = "http://github.com/403labs/spreedly_core"
   s.email             = "github@403labs.com"
-  s.authors           = [ "403 Labs" ]
+  s.authors           = [ "403 Labs", "Spreedly" ]
 
   s.files             = %w( README.md Rakefile LICENSE )
   s.files            += Dir.glob("lib/**/*")
