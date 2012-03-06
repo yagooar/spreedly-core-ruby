@@ -12,7 +12,8 @@ module SpreedlyCore
     # timeout requests after 10 seconds
     default_timeout 10
 
-    base_uri "https://spreedlycore.com/#{API_VERSION}"
+    #base_uri "https://spreedlycore.com/#{API_VERSION}"
+    base_uri "https://core.spreedly.dev:11001/#{API_VERSION}"
 
     def self.configure(login, secret, options = {})
       @@login = login
