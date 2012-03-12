@@ -45,7 +45,7 @@ module SpreedlyCore
     if login.nil? || secret.nil?
       raise ArgumentError.new("You must provide a login and a secret. Gem will look for ENV['SPREEDLYCORE_API_LOGIN'] and ENV['SPREEDLYCORE_API_SECRET'], but you may also pass in a hash with :login and :secret keys.")
     end
-    Base.configure(login, secret)
+    Base.configure(login, secret, options)
   end
 
   # returns the configured SpreedlyCore login

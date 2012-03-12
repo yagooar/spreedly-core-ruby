@@ -18,6 +18,7 @@ module SpreedlyCore
     def self.configure(login, secret, options = {})
       @@login = login
       self.basic_auth(@@login, secret)
+      @@gateway_token = options.delete(:gateway_token)
     end
 
     def self.login; @@login; end
