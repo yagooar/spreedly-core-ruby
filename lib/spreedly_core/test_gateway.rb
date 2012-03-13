@@ -5,10 +5,14 @@ module SpreedlyCore
       # get the list of gateways and return the first test gateway
       # if none exist, create one
       verify_get("/gateways.xml") do |response|
-        response.parsed_response["gateways"]["gateway"].each do |gateway|
-          g = new gateway
+        # will return Hash if only 1 gateways->gateway, Array otherwise
+        gateways = response.parsed_response["gateways"]["gateway"]
+        gateways = [gateways] unless gateways.is_a?(Array)
+        
+        gateways.each do |gateway_hash|
+          g = new gateway_hash
           return g if g.gateway_type == "test" && g.redacted == false
-        end
+        end unless gateways.nil?
       end
 
       # no test gateway yet, let's create one

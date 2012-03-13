@@ -5,7 +5,9 @@ module SpreedlyCore
     
     # Net::HTTP::Options is configured to not have a body.
     # Lets give it the body it's always dreamed of
-    Net::HTTP::Options::RESPONSE_HAS_BODY = true
+    silence_warnings do
+      Net::HTTP::Options::RESPONSE_HAS_BODY = true
+    end
     
     format :xml
 
@@ -13,7 +15,7 @@ module SpreedlyCore
     default_timeout 10
 
     #base_uri "https://spreedlycore.com/#{API_VERSION}"
-    base_uri "https://core.spreedly.dev:11001/#{API_VERSION}"
+    base_uri "http://core.spreedly.dev:11001/#{API_VERSION}"
 
     def self.configure(login, secret, options = {})
       @@login = login
@@ -27,7 +29,7 @@ module SpreedlyCore
     # make a post request to path
     # If the request succeeds, provide the respones to the &block
     def self.verify_post(path, options={}, &block)
-      verify_request(:post, path, options, 200, 422, &block)
+      verify_request(:post, path, options, 200, 201, 422, &block)
     end
 
     # make a put request to path

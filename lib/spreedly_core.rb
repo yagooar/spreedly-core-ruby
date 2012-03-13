@@ -5,6 +5,7 @@ require 'httparty'
 require 'spreedly_core/base'
 require 'spreedly_core/payment_method'
 require 'spreedly_core/gateway'
+require 'spreedly_core/test_gateway'
 require 'spreedly_core/transactions'
 
 module SpreedlyCore
@@ -34,16 +35,23 @@ module SpreedlyCore
     login = ENV['SPREEDLYCORE_API_LOGIN']
     secret = ENV['SPREEDLYCORE_API_SECRET']
 
-    unless login && secret
-      Kernel.warn("It is STRONGLY preferred that you house your Spreedly Core credentials in environment variables.")
-      Kernal.warn("This gem is expecting variables named SPREEDLYCORE_API_LOGIN and SPREEDLYCORE_API_SECRET.")
+    if options[:api_login]
+      Kernel.warn("ENV and arg both present for api_login. Defaulting to arg value") if login
+      login = options[:api_login]
     end
 
-    login ||= options[:login]
-    secret ||= options[:secret]
+    if options[:api_secret]
+      Kernel.warn("ENV and arg both present for api_secret. Defaulting to arg value") if login
+      secret = options[:api_secret]
+    end
+
+    if options[:api_login] || options[:api_secret]
+      Kernel.warn("It is STRONGLY preferred that you house your Spreedly Core credentials only in environment variables.")
+      Kernel.warn("This gem prefers only environment variables named SPREEDLYCORE_API_LOGIN and SPREEDLYCORE_API_SECRET.")
+    end
 
     if login.nil? || secret.nil?
-      raise ArgumentError.new("You must provide a login and a secret. Gem will look for ENV['SPREEDLYCORE_API_LOGIN'] and ENV['SPREEDLYCORE_API_SECRET'], but you may also pass in a hash with :login and :secret keys.")
+      raise ArgumentError.new("You must provide a login and a secret. Gem will look for ENV['SPREEDLYCORE_API_LOGIN'] and ENV['SPREEDLYCORE_API_SECRET'], but you may also pass in a hash with :api_login and :api_secret keys.")
     end
     Base.configure(login, secret, options)
   end

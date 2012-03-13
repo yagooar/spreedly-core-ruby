@@ -1,6 +1,6 @@
 module SpreedlyCore
   class Gateway < Base
-    attr_reader(:name, :gateway_type, :auth_modes, :supports_capture,
+    attr_reader(:name, :token, :gateway_type, :auth_modes, :supports_capture,
                 :supports_authorize, :supports_purchase, :supports_void,
                 :supports_credit, :redacted)
 
