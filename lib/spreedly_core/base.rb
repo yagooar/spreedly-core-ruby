@@ -25,6 +25,7 @@ module SpreedlyCore
 
     def self.login; @@login; end
     def self.gateway_token; @@gateway_token; end
+    def self.gateway_token=(gateway_token); @@gateway_token = gateway_token; end
 
     # make a post request to path
     # If the request succeeds, provide the respones to the &block

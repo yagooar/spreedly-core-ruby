@@ -15,5 +15,9 @@ module SpreedlyCore
       attrs.merge!(attrs.delete("characteristics") || {})
       super(attrs)
     end
+
+    def use!
+      self.class.gateway_token = self.token
+    end
   end
 end

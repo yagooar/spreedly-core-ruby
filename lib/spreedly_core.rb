@@ -56,6 +56,10 @@ module SpreedlyCore
     Base.configure(login, secret, options)
   end
 
+  def self.gateway_token=(gateway_token)
+    Base.gateway_token = gateway_token
+  end
+
   # returns the configured SpreedlyCore login
   def self.login; Base.login; end
 
