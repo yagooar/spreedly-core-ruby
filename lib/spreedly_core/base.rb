@@ -5,9 +5,7 @@ module SpreedlyCore
     
     # Net::HTTP::Options is configured to not have a body.
     # Lets give it the body it's always dreamed of
-    silence_warnings do
-      Net::HTTP::Options::RESPONSE_HAS_BODY = true
-    end
+    Net::HTTP::Options::RESPONSE_HAS_BODY = true
     
     format :xml
 
@@ -94,5 +92,4 @@ module SpreedlyCore
                 end
     end
   end
-
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    spreedly_core (0.1.2)
+    spreedly-core-ruby (0.1.0)
       httparty (= 0.7.7)
 
 GEM
@@ -36,5 +36,5 @@ PLATFORMS
 DEPENDENCIES
   rake (= 0.8.7)
   ruby-debug19
-  spreedly_core!
+  spreedly-core-ruby!
   webmock (~> 1.6.2)

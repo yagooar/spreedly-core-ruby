@@ -2,13 +2,13 @@ $LOAD_PATH.unshift 'lib'
 require "spreedly_core/version"
 
 Gem::Specification.new do |s|
-  s.name              = "spreedly_core"
+  s.name              = "spreedly-core-ruby"
   s.version           = SpreedlyCore::VERSION
   s.date              = Time.now.strftime('%Y-%m-%d')
   s.summary           = "Ruby API for Spreedly Core"
-  s.homepage          = "http://github.com/403labs/spreedly_core"
-  s.email             = "github@403labs.com"
-  s.authors           = [ "403 Labs", "Spreedly" ]
+  s.homepage          = "http://github.com/spreedly/spreedly-core-ruby"
+  s.email             = "support@spreedly.com"
+  s.authors           = [ "Spreedly", "403 Labs" ]
 
   s.files             = %w( README.md Rakefile LICENSE )
   s.files            += Dir.glob("lib/**/*")

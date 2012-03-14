@@ -33,16 +33,14 @@ module SpreedlyCore
 
     # Retain the payment method
     def retain
-      self.class.verify_put("/payment_methods/#{token}/retain.xml",
-                            :body => {}, :has_key => "transaction") do |response|
+      verify_put("/payment_methods/#{token}/retain.xml", :body => {}, :has_key => "transaction") do |response|
         RetainTransaction.new(response.parsed_response["transaction"])
       end
     end
 
     # Redact the payment method
     def redact
-      self.class.verify_put("/payment_methods/#{token}/redact.xml",
-                            :body => {}, :has_key => "transaction") do |response|
+      verify_put("/payment_methods/#{token}/redact.xml", :body => {}, :has_key => "transaction") do |response|
         RedactTransaction.new(response.parsed_response["transaction"])
       end
     end
@@ -66,7 +64,13 @@ module SpreedlyCore
       @errors.empty?
     end
 
-    protected
+
+
+
+protected
+
+
+
 
     # Validate additional cc fields like first_name, last_name, etc when
     # configured to do so
