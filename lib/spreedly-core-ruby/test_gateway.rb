@@ -6,13 +6,15 @@ module SpreedlyCore
       # if none exist, create one
       verify_get("/gateways.xml") do |response|
         # will return Hash if only 1 gateways->gateway, Array otherwise
-        gateways = response.parsed_response["gateways"]["gateway"]
-        gateways = [gateways] unless gateways.is_a?(Array)
-        
-        gateways.each do |gateway_hash|
-          g = new gateway_hash
-          return g if g.gateway_type == "test" && g.redacted == false
-        end unless gateways.nil?
+        gateways = response.parsed_response["gateways"].try(:[], "gateway")
+        if gateways
+          gateways = [gateways] unless gateways.is_a?(Array)
+          
+          gateways.each do |gateway_hash|
+            g = new gateway_hash
+            return g if g.gateway_type == "test" && g.redacted == false
+          end unless gateways.nil?
+        end
       end
 
       # no test gateway yet, let's create one

@@ -138,5 +138,12 @@ module SpreedlyCore
     handles "Credit"
     attr_reader :reference_token
   end
+
+  class AddPaymentMethodTransaction < Transaction
+    include HasIpAddress
+
+    handles "AddPaymentMethod"
+    attr_reader :payment_method
+  end
   
 end

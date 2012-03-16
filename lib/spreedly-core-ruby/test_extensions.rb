@@ -47,7 +47,7 @@ module SpreedlyCore
                            :api_login => SpreedlyCore::Base.login,
                            :data => pass_through_data)
       
-      response = self.post("/payment_methods", :body => data, :no_follow => true)
+      response = post("/payment_methods", :body => data, :no_follow => true)
     rescue HTTParty::RedirectionTooDeep => e
       if e.response.body =~ /href="(.*?)"/
         # rescuing the RedirectionTooDeep exception is apparently the way to

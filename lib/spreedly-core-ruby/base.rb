@@ -34,7 +34,7 @@ module SpreedlyCore
     # make a put request to path
     # If the request succeeds, provide the respones to the &block
     def self.verify_put(path, options={}, &block)
-      verify_request(:put, path, options,  &block)
+      verify_request(:put, path, options, 200, 422, &block)
     end
 
     # make a get request to path
@@ -68,6 +68,10 @@ module SpreedlyCore
       if options.has_key?(:has_key) &&
           (response.parsed_response.nil? || !response.parsed_response.has_key?(options[:has_key]))
         raise InvalidResponse.new(response, "Expected parsed response to contain key '#{options[:has_key]}'")
+      end
+
+      if (response.code == 422 && !response.parsed_response.nil? && response.parsed_response.has_key?("errors"))
+        raise UnprocessableRequest.new(response.parsed_response["errors"]["error"])
       end
 
       block.call(response).tap do |obj|

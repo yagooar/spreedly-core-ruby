@@ -2,11 +2,11 @@ require 'set'
 
 require 'httparty'
 
-require 'spreedly_core/base'
-require 'spreedly_core/payment_method'
-require 'spreedly_core/gateway'
-require 'spreedly_core/test_gateway'
-require 'spreedly_core/transactions'
+require 'spreedly-core-ruby/base'
+require 'spreedly-core-ruby/payment_method'
+require 'spreedly-core-ruby/gateway'
+require 'spreedly-core-ruby/test_gateway'
+require 'spreedly-core-ruby/transactions'
 
 module SpreedlyCore
   # Hash of user friendly credit card name to SpreedlyCore API name
@@ -18,12 +18,20 @@ module SpreedlyCore
   }
 
   class Error < RuntimeError; end
+  
   # Custom exception which occurs when a request to SpreedlyCore times out
   # See SpreedlyCore::Base.default_timeout 
   class TimeOutError < Error; end
   class InvalidResponse < Error
     def initialize(response, message)
       super("#{message}\nResponse:\n#{response.inspect}")
+    end
+  end
+
+  class UnprocessableRequest < Error
+    def initialize(errors)
+      errors = [errors] unless errors.is_a?(Array)
+      super(errors.join("\n"))
     end
   end
 

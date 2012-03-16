@@ -25,6 +25,12 @@ module SpreedlyCore
       end
     end
 
+    def self.create(credit_card)
+      verify_post("/payment_methods.xml", :body => {:credit_card => credit_card}) do |response|
+        AddPaymentMethodTransaction.new(response.parsed_response["transaction"])
+      end
+    end
+
     # Create a new PaymentMethod based on the attrs hash and then validate
     def initialize(attrs={})
       super(attrs)
@@ -33,14 +39,14 @@ module SpreedlyCore
 
     # Retain the payment method
     def retain
-      verify_put("/payment_methods/#{token}/retain.xml", :body => {}, :has_key => "transaction") do |response|
+      self.class.verify_put("/payment_methods/#{token}/retain.xml", :body => {}, :has_key => "transaction") do |response|
         RetainTransaction.new(response.parsed_response["transaction"])
       end
     end
 
     # Redact the payment method
     def redact
-      verify_put("/payment_methods/#{token}/redact.xml", :body => {}, :has_key => "transaction") do |response|
+      self.class.verify_put("/payment_methods/#{token}/redact.xml", :body => {}, :has_key => "transaction") do |response|
         RedactTransaction.new(response.parsed_response["transaction"])
       end
     end
@@ -53,6 +59,18 @@ module SpreedlyCore
     # Make an authorize against payment method. You can then later capture against the authorize
     def authorize(amount, currency=nil,  _gateway_token=nil, ip_address=nil)
       purchase_or_authorize(:authorize, amount, currency, _gateway_token, ip_address)
+    end
+
+    # Update the attributes of a payment method
+    def update(attributes)
+      opts = {
+        :headers => {"Content-Type" => "application/xml"},
+        :body => attributes.to_xml(:root => "payment_method", :dasherize => false)
+      }
+
+      self.class.verify_put("/payment_methods/#{token}.xml", opts) do |response|
+        PaymentMethod.new(response.parsed_response["payment_method"])
+      end
     end
 
     # Returns the URL that CC data should be submitted to.
