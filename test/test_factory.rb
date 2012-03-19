@@ -1,9 +1,8 @@
 module SpreedlyCore
   module TestFactory
     def given_a_payment_method(cc_card=:master, card_options={})
-      token = PaymentMethod.create_test_token cc_data(cc_card, card_options), "customer-42"
-      assert payment_method = PaymentMethod.find(token)
-      assert_equal "customer-42", payment_method.data
+      token = PaymentMethod.create_test_token cc_data(cc_card, card_options)
+      assert payment_method = PaymentMethod.find(token), "Couldn't find payment method with token(#{token})"
       assert_equal token, payment_method.token
       payment_method
     end

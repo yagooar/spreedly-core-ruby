@@ -15,7 +15,11 @@ module SpreedlyCore
     def self.all
       verify_get("/gateways.xml") do |response|
         # will return Hash if only 1 gateways->gateway, Array otherwise
-        gateways = response.parsed_response["gateways"].try(:[], "gateway")
+        gateways =  begin
+                      response.parsed_response["gateways"]["gateway"]
+                    rescue
+                      nil
+                    end
         if gateways
           gateways = [gateways] unless gateways.is_a?(Array)
           
