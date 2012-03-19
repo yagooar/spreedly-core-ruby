@@ -11,6 +11,34 @@ module SpreedlyCore
       end
     end
 
+    # returns an array of all the Gateways owned by the account
+    def self.all
+      verify_get("/gateways.xml") do |response|
+        # will return Hash if only 1 gateways->gateway, Array otherwise
+        gateways = response.parsed_response["gateways"].try(:[], "gateway")
+        if gateways
+          gateways = [gateways] unless gateways.is_a?(Array)
+          
+          return gateways.collect{|gateway_hash| new gateway_hash}
+        end
+      end
+
+      return []
+    end
+
+    def self.create(gateway_options)
+      raise ArgumentError.new("gateway_options must be a hash") unless gateway_options.is_a?(Hash)
+      
+      opts = {
+        :headers => {"Content-Type" => "application/xml"},
+        :body => gateway_options.to_xml(:root => :gateway, :dasherize => false),
+      }
+
+      verify_post("/gateways.xml", opts) do |response|
+        return new response.parsed_response["gateway"]
+      end
+    end
+
     def initialize(attrs={})
       attrs.merge!(attrs.delete("characteristics") || {})
       super(attrs)
