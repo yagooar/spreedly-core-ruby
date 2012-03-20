@@ -20,6 +20,7 @@ require 'webmock'
 
 class Test::Unit::TestCase
   def assert_false(test, failure_message=nil)
+    failure_message = "" if failure_message.nil?
     assert(!test, failure_message)
   end
 

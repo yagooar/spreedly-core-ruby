@@ -51,5 +51,9 @@ module SpreedlyCore
     def use!
       self.class.gateway_token = self.token
     end
+
+    def ==(other)
+      self.token == other.token
+    end
   end
 end

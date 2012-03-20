@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'test_common'
 
 
 # In order to run tests
@@ -6,20 +6,7 @@ require 'test_helper'
 #  2. Add your spreedly core credentials to test/config/spreedly_core.yml
 module SpreedlyCore
   class SpreedlyCoreTest < Test::Unit::TestCase
-    include TestHelper
-    include TestFactory
-  
-    def setup
-      raise "environment variables for SPREEDLYCORE_API_LOGIN and SPREEDLYCORE_API_SECRET must be set" unless ENV['SPREEDLYCORE_API_LOGIN'] && ENV['SPREEDLYCORE_API_SECRET']
-
-      SpreedlyCore.configure
-      unless SpreedlyCore.gateway_token
-        gateway = SpreedlyCore::TestGateway.get_or_create
-        gateway.use!
-      end
-
-      PaymentMethod.reset_additional_required_cc_fields
-    end
+    include TestCommon
 
     def test_mocked_500_error
       with_disabled_network do

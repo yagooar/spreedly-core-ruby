@@ -1,12 +1,14 @@
 require 'set'
 
 require 'httparty'
+require 'active_support/core_ext/hash/conversions'
 
 require 'spreedly-core-ruby/base'
 require 'spreedly-core-ruby/payment_method'
 require 'spreedly-core-ruby/gateway'
 require 'spreedly-core-ruby/test_gateway'
 require 'spreedly-core-ruby/transactions'
+require 'active_support/core_ext/hash/conversions'
 
 module SpreedlyCore
   # Hash of user friendly credit card name to SpreedlyCore API name

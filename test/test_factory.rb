@@ -91,7 +91,7 @@ module SpreedlyCore
       assert_equal credit_amount, credit.amount
       assert_equal ip_address, credit.ip
       assert credit.succeeded?
-      assert CreditTransaction, credit.class
+      assert_equal CreditTransaction, credit.class
       credit
     end
   end
