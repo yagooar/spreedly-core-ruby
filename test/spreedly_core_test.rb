@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'test_common'
 
 
 # In order to run tests
@@ -6,14 +6,7 @@ require 'test_helper'
 #  2. Add your spreedly core credentials to test/config/spreedly_core.yml
 module SpreedlyCore
   class SpreedlyCoreTest < Test::Unit::TestCase
-    include TestHelper
-    include TestFactory
-  
-    def setup
-      config = YAML.load(File.read(File.dirname(__FILE__) + '/config/spreedly_core.yml'))
-      SpreedlyCore.configure(config)
-      PaymentMethod.reset_additional_required_cc_fields
-    end
+    include TestCommon
 
     def test_mocked_500_error
       with_disabled_network do

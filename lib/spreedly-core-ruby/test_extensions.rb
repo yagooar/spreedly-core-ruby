@@ -38,24 +38,26 @@ module SpreedlyCore
   end
 
   class PaymentMethod
-
     # Call spreedly core to create a test token.
     # pass_through_data will be added as the "data" field.
     # 
-    def self.create_test_token(cc_data={}, pass_through_data=nil)
-      data = cc_data.merge(:redirect_url => "http://example.com",
-                           :api_login => SpreedlyCore::Base.login,
-                           :data => pass_through_data)
-      
-      response = post("/payment_methods", :body => data, :no_follow => true)
-    rescue HTTParty::RedirectionTooDeep => e
-      if e.response.body =~ /href="(.*?)"/
-        # rescuing the RedirectionTooDeep exception is apparently the way to
-        # handle redirect following
-        token = CGI::parse(URI.parse($1).query)["token"].first
+    def self.create_test_token(cc_overrides = {})
+      card = {
+        :first_name => "John",
+        :last_name => "Foo",
+        :card_type => :visa,
+        :number => '4111111111111111',
+        :verification_value => 123,
+        :month => 4,
+        :year => Time.now.year + 1
+      }
+      if cc_overrides.is_a?(Hash)
+        overrides = cc_overrides[:credit_card] || cc_overrides["credit_card"] || cc_overrides
+        card.merge!(overrides)
       end
-      raise "Could not find token in body: #{e.response.body}" if token.nil?
-      return token
+
+      pm = PaymentMethod.create(card)
+      pm.payment_method["token"]
     end
   end
 end

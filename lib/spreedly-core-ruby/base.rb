@@ -5,7 +5,9 @@ module SpreedlyCore
     
     # Net::HTTP::Options is configured to not have a body.
     # Lets give it the body it's always dreamed of
+    old_verbose, $VERBOSE = $VERBOSE, nil
     Net::HTTP::Options::RESPONSE_HAS_BODY = true
+    $VERBOSE = old_verbose
     
     format :xml
 

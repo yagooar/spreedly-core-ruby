@@ -1,15 +1,8 @@
-require 'test_helper'
+require 'test_common'
 
 module SpreedlyCore
   class TransactionTest < Test::Unit::TestCase
-    include TestHelper
-    include TestFactory
-  
-    def setup
-      config = YAML.load(File.read(File.dirname(__FILE__) + '/config/spreedly_core.yml'))
-      SpreedlyCore.configure(config)
-      PaymentMethod.reset_additional_required_cc_fields
-    end
+    include TestCommon
 
     def test_not_found_transaction
       assert_raises InvalidResponse do
