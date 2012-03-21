@@ -44,6 +44,7 @@ module SpreedlyCore
   def self.configure(options = {})
     login = ENV['SPREEDLYCORE_API_LOGIN']
     secret = ENV['SPREEDLYCORE_API_SECRET']
+    gateway_token = ENV['SPREEDLYCORE_GATEWAY_TOKEN']
 
     if options[:api_login]
       Kernel.warn("ENV and arg both present for api_login. Defaulting to arg value") if login
@@ -51,13 +52,19 @@ module SpreedlyCore
     end
 
     if options[:api_secret]
-      Kernel.warn("ENV and arg both present for api_secret. Defaulting to arg value") if login
+      Kernel.warn("ENV and arg both present for api_secret. Defaulting to arg value") if secret
       secret = options[:api_secret]
     end
 
+    if options[:gateway_token]
+      Kernel.warn("ENV and arg both present for gateway_token. Defaulting to arg value") if gateway_token
+      gateway_token = options[:gateway_token]
+    end
+    options[:gateway_token] ||= gateway_token
+
     if options[:api_login] || options[:api_secret]
       Kernel.warn("It is STRONGLY preferred that you house your Spreedly Core credentials only in environment variables.")
-      Kernel.warn("This gem prefers only environment variables named SPREEDLYCORE_API_LOGIN and SPREEDLYCORE_API_SECRET.")
+      Kernel.warn("This gem prefers only environment variables named SPREEDLYCORE_API_LOGIN, SPREEDLYCORE_API_SECRET, and optionally SPREEDLYCORE_GATEWAY_TOKEN.")
     end
 
     if login.nil? || secret.nil?
