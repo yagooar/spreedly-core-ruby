@@ -245,21 +245,23 @@ In special cases, you may want to create payment types programmatically and will
 * Successful execution will return an AddPaymentMethodTransaction object (*not* a PaymentMethod object). Adding a payment method is wrapped in a transaction much like doing a purchase or authorize request is. The returned object will have the PaymentMethod object as a child.
 * You still need to manually call `retain` on the payment method if you wish to retain the card.
 
-    SpreedlyCore.configure
-    
-    pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => good_card_hash)
-    pm_token = pm_transaction.payment_method.token
-    puts "Payment method token is #{pm_token}"
-    
-    retain_transaction = pm_transaction.payment_method.retain
-    retain_transaction.succeeded? # true
-    
-    begin
+The example below illustrates both a successful payment method creation, and how to handle one with errors.
+
+	SpreedlyCore.configure
+	
+	pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => good_card_hash)
+	pm_token = pm_transaction.payment_method.token
+	puts "Payment method token is #{pm_token}"
+	
+	retain_transaction = pm_transaction.payment_method.retain
+	retain_transaction.succeeded? # true
+	
+	begin
       pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => bad_card_hash)
     rescue Exception => e
       puts "Errors when submitting the card: #{e.errors.join(",")}"
     end
-    
+
 Contributing
 ------------
 1. [Fork](http://help.github.com/forking/) spreedly-core-ruby
