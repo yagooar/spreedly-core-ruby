@@ -1,10 +1,11 @@
 SpreedlyCore
 ======
-
-spreedly-core-ruby is a Ruby library for accessing the [Spreedly Core API](https://spreedlycore.com/). Spreedly Core is a Software-as-a-Service billing solution that serves two major functions for companies and developers. 
+spreedly-core-ruby is a Ruby library for accessing the [Spreedly Core API](https://spreedlycore.com/). Spreedly Core is a Software-as-a-Service billing solution that serves two major functions for companies and developers.
 
 * First, it removes your [PCI Compliance](https://www.pcisecuritystandards.org/) requirement by pushing the card data handling and storage outside of your application. This is possible by having your customers POST their credit card info to the Spreedly Core service while embedding a transparent redirect URL back to your application (see "Submit payment form" on [the quick start guide](https://spreedlycore.com/manual/quickstart)). 
 * Second, it removes any possibility of your gateway locking you in by owning your customer billing data (yes, this happens). By allowing you to charge any card against whatever gateways you as a company have signed up for, you retain all of your customer data and can switch between gateways as you please. Also, expanding internationally won't require an additional technical integration with yet another gateway.
+
+Credit where credit is due: our friends over at [403 Labs](http://www.403labs.com/) carried most of the weight in cutting the initial version of this gem, and we can't thank them enough for their work.
 
 Quickstart
 ----------
@@ -172,22 +173,27 @@ Additional Field Validation
 ----------
 The Spreely Core API provides validation of the credit card number, security code, and
 first and last name. In most cases this is enough; however, sometimes you may want to
-enforce the full billing information as well. This can be accomplished via the following:
+enforce the full billing information as well. The following example illustrates how this can be accomplished.
 
     SpreedlyCore.configure
     SpreedlyCore::PaymentMethod.additional_required_cc_fields :address1, :city, :state, :zip
+    
     master_card_data = SpreedlyCore::TestHelper.cc_data(:master)
     token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
+    
     payment_method = SpreedlyCore::PaymentMethod.find(token)
     payment_method.valid? # false
     payment_method.errors # ["Address1 can't be blank", "City can't be blank", "State can't be blank", "Zip can't be blank"]
+    
     master_card_data = SpreedlyCore::TestHelper.cc_data(:master, :credit_card => {:address1 => "742 Evergreen Terrace", :city => "Springfield", :state => "IL", 62701})
+    token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
+    
     payment_method = SpreedlyCore::PaymentMethod.find(token)
     payment_method.valid? # returns true
     payment_method.errors # []
 
    
-Configuring SpreedlyCore for use in production (Rails example)
+Configuring SpreedlyCore for Use in Production (Rails example)
 ----------
 When you're ready for primetime, you'll need to complete a couple more steps to start processing real transactions.
 
@@ -196,18 +202,26 @@ When you're ready for primetime, you'll need to complete a couple more steps to 
 
 For this example, I will be using an Authorize.net account that only has a login and password credential.
 
-    authorize_credentials = {:login => 'my_authorize_login', :password => 'my_authorize_password'}
     SpreedlyCore.configure
-    gateway = SpreedlyCore::Gateway.create(authorize_credentials)
-    puts "Authorize.net gateway token is #{gateway.token}"
+    
+    gateway = SpreedlyCore::Gateway.create(:login => 'my_authorize_login', :password => 'my_authorize_password', :gateway_type => 'authorize_net')
     gateway.use!
     
-For most users, you will start off using only 1 gateway token, and as such can configure an additional environment variable to hold your gateway token. In addition to the previous environment variables, the SpreedlyCore.configure method will also look for a SPREEDLYCORE_GATEWAY_TOKEN environment value.
+    puts "Authorize.net gateway token is #{gateway.token}"
+    
+For most users, you will start off using only one gateway token, and as such can configure it as an environment variable to hold your gateway token. In addition to the previous environment variables, the `SpreedlyCore.configure` method will also look for a SPREEDLYCORE_GATEWAY_TOKEN environment value.
 
 	# create an initializer at config/initializers/spreedly_core.rb
     # values already set for ENV['SPREEDLYCORE_API_LOGIN'], ENV['SPREEDLYCORE_API_SECRET'], and ENV['SPREEDLYCORE_GATEWAY_TOKEN']
     SpreedlyCore.configure
     
+If you wish to require additional credit card fields, the initializer is the best place to set this up.
+
+    SpreedlyCore.configure
+    SpreedlyCore::PaymentMethod.additional_required_cc_fields :address1, :city, :state, :zip
+    
+Using Multiple Gateways
+------------
 For those using multiple gateway tokens, there is a class variable that holds the active gateway token. Before running any sort of transaction against a payment method, you'll need to set the gateway token that you wish to charge against.
 
     SpreedlyCore.configure
@@ -218,19 +232,40 @@ For those using multiple gateway tokens, there is a class variable that holds th
     SpreedlyCore.gateway_token(authorize_gateway_token)
     SpreedlyCore::PaymentMethod.find(pm_token).purchase(2885)
     
-If you wish to require additional credit card fields, the initializer is the best place to set this up.
+    SpreedlyCore.gateway_token(braintree_gateway_token)
+    SpreedlyCore::PaymentMethod.find(pm_token).credit(150)
+    
+Creating Payment Types Programatically
+------------
+**Please note that this practice requires you to be PCI compliant!**
+
+In special cases, you may want to create payment types programmatically and will not be using the transparent redirect functionality. This can be done using the `SpreedlyCore::PaymentMethod.create` method, and will behave as follows:
+
+* Card validation is done in realtime, and a 422 Unprocessable will be returned if validation fails.
+* Successful execution will return an AddPaymentMethodTransaction object (*not* a PaymentMethod object). Adding a payment method is wrapped in a transaction much like doing a purchase or authorize request is. The returned object will have the PaymentMethod object as a child.
+* You still need to manually call `retain` on the payment method if you wish to retain the card.
 
     SpreedlyCore.configure
-    SpreedlyCore::PaymentMethod.additional_required_cc_fields :address1, :city, :state, :zip  
-
+    
+    pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => good_card_hash)
+    pm_token = pm_transaction.payment_method.token
+    puts "Payment method token is #{pm_token}"
+    
+    retain_transaction = pm_transaction.payment_method.retain
+    retain_transaction.succeeded? # true
+    
+    begin
+      pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => bad_card_hash)
+    rescue Exception => e
+      puts "Errors when submitting the card: #{e.errors.join(",")}"
+    end
+    
 Contributing
 ------------
-
-Once you've made your commits:
-
-1. [Fork](http://help.github.com/forking/) SpreedlyCore
+1. [Fork](http://help.github.com/forking/) spreedly-core-ruby
 2. Create a topic branch - `git checkout -b my_branch`
+3. Make your changes on your topic branch.
+4. DO NOT bump the version number, or put it in a separate commit that I can ignore.
 3. Push to your branch - `git push origin my_branch`
 4. Create a [Pull Request](http://help.github.com/pull-requests/) from your branch
-5. Profit! 
 
