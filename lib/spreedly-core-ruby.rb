@@ -32,8 +32,12 @@ module SpreedlyCore
   end
 
   class UnprocessableRequest < Error
+    attr_accessor :errors
+
     def initialize(errors)
       errors = [errors] unless errors.is_a?(Array)
+      @errors = errors
+      
       super(errors.join("\n"))
     end
   end

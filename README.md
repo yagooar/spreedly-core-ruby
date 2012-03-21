@@ -237,19 +237,29 @@ For those using multiple gateway tokens, there is a class variable that holds th
     
 Creating Payment Types Programatically
 ------------
-For those using multiple gateway tokens, there is a class variable that holds the active gateway token. Before running any sort of transaction against a payment method, you'll need to set the gateway token that you wish to charge against.
+**Please note that this practice requires you to be PCI compliant!**
+
+In special cases, you may want to create payment types programmatically and will not be using the transparent redirect functionality. This can be done using the `SpreedlyCore::PaymentMethod.create` method, and will behave as follows:
+
+* Card validation is done in realtime, and a 422 Unprocessable will be returned if validation fails.
+* Successful execution will return an AddPaymentMethodTransaction object (*not* a PaymentMethod object). Adding a payment method is wrapped in a transaction much like doing a purchase or authorize request is. The returned object will have the PaymentMethod object as a child.
+* You still need to manually call `retain` on the payment method if you wish to retain the card.
 
     SpreedlyCore.configure
     
-    SpreedlyCore.gateway_token(paypal_gateway_token)
-    SpreedlyCore::PaymentMethod.find(pm_token).purchase(550)
+    pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => good_card_hash)
+    pm_token = pm_transaction.payment_method.token
+    puts "Payment method token is #{pm_token}"
     
-    SpreedlyCore.gateway_token(authorize_gateway_token)
-    SpreedlyCore::PaymentMethod.find(pm_token).purchase(2885)
+    retain_transaction = pm_transaction.payment_method.retain
+    retain_transaction.succeeded? # true
     
-    SpreedlyCore.gateway_token(braintree_gateway_token)
-    SpreedlyCore::PaymentMethod.find(pm_token).credit(150)
-
+    begin
+      pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => bad_card_hash)
+    rescue Exception => e
+      puts "Errors when submitting the card: #{e.errors.join(",")}"
+    end
+    
 Contributing
 ------------
 1. [Fork](http://help.github.com/forking/) spreedly-core-ruby
