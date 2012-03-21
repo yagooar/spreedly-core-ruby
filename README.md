@@ -209,7 +209,7 @@ For this example, I will be using an Authorize.net account that only has a login
     
     puts "Authorize.net gateway token is #{gateway.token}"
     
-For most users, you will start off using only one gateway token, and as such can configure it as an environment variable to hold your gateway token. In addition to the previous environment variables, the SpreedlyCore.configure method will also look for a SPREEDLYCORE_GATEWAY_TOKEN environment value.
+For most users, you will start off using only one gateway token, and as such can configure it as an environment variable to hold your gateway token. In addition to the previous environment variables, the `SpreedlyCore.configure` method will also look for a SPREEDLYCORE_GATEWAY_TOKEN environment value.
 
 	# create an initializer at config/initializers/spreedly_core.rb
     # values already set for ENV['SPREEDLYCORE_API_LOGIN'], ENV['SPREEDLYCORE_API_SECRET'], and ENV['SPREEDLYCORE_GATEWAY_TOKEN']
@@ -253,7 +253,7 @@ For those using multiple gateway tokens, there is a class variable that holds th
 Contributing
 ------------
 1. [Fork](http://help.github.com/forking/) spreedly-core-ruby
-2. Create a topic branch - `git checkout -b my_branch
+2. Create a topic branch - `git checkout -b my_branch`
 3. Make your changes on your topic branch.
 4. DO NOT bump the version number, or put it in a separate commit that I can ignore.
 3. Push to your branch - `git push origin my_branch`
