@@ -25,13 +25,15 @@ module SpreedlyCore
 
       ENV['SPREEDLYCORE_API_LOGIN'] = old_api_login
       ENV['SPREEDLYCORE_API_SECRET'] = old_api_secret
-      ENV['SPREEDLYCORE_GATEWAY_TOKEN'] = old_gateway_token
+      ENV['SPREEDLYCORE_GATEWAY_TOKEN'] = 'any_value'
 
       SpreedlyCore.gateway_token = nil
       assert_nothing_raised ArgumentError do
         SpreedlyCore.configure
       end
       assert_not_nil SpreedlyCore.gateway_token
+
+      ENV['SPREEDLYCORE_GATEWAY_TOKEN'] = old_gateway_token
     ensure
       $VERBOSE = old_verbose
     end
