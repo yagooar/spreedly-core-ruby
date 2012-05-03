@@ -2,7 +2,7 @@ SpreedlyCore
 ======
 spreedly-core-ruby is a Ruby library for accessing the [Spreedly Core API](https://spreedlycore.com/). Spreedly Core is a Software-as-a-Service billing solution that serves two major functions for companies and developers.
 
-* First, it removes your [PCI Compliance](https://www.pcisecuritystandards.org/) requirement by pushing the card data handling and storage outside of your application. This is possible by having your customers POST their credit card info to the Spreedly Core service while embedding a transparent redirect URL back to your application (see "Submit payment form" on [the quick start guide](https://spreedlycore.com/manual/quickstart)). 
+* First, it removes your [PCI Compliance](https://www.pcisecuritystandards.org/) requirement by pushing the card data handling and storage outside of your application. This is possible by having your customers POST their credit card info to the Spreedly Core service while embedding a transparent redirect URL back to your application (see "Submit payment form" on [the quick start guide](https://spreedlycore.com/manual/quickstart)).
 * Second, it removes any possibility of your gateway locking you in by owning your customer billing data (yes, this happens). By allowing you to charge any card against whatever gateways you as a company have signed up for, you retain all of your customer data and can switch between gateways as you please. Also, expanding internationally won't require an additional technical integration with yet another gateway.
 
 Credit where credit is due: our friends over at [403 Labs](http://www.403labs.com/) carried most of the weight in cutting the initial version of this gem, and we can't thank them enough for their work.
@@ -34,20 +34,20 @@ Now that you have a test gateway set up, we'll need to set up your payment form 
 	        <input name="api_login" type="hidden" value="Ll6fAtoVSTyVMlJEmtpoJV8Shw5" />
 	        <label for="credit_card_first_name">First name</label>
 	        <input id="credit_card_first_name" name="credit_card[first_name]" type="text" />
-	
+
 	        <label for="credit_card_last_name">Last name</label>
 	        <input id="credit_card_last_name" name="credit_card[last_name]" type="text" />
-	
+
 	        <label for="credit_card_number">Card Number</label>
 	        <input id="credit_card_number" name="credit_card[number]" type="text" />
-	
+
 	        <label for="credit_card_verification_value">Security Code</label>
 	        <input id="credit_card_verification_value" name="credit_card[verification_value]" type="text" />
-	
+
 	        <label for="credit_card_month">Expires on</label>
 	        <input id="credit_card_month" name="credit_card[month]" type="text" />
 	        <input id="credit_card_year" name="credit_card[year]" type="text" />
-	
+
 	        <button type='submit'>Submit Payment</button>
 	    </fieldset>
 	</form>
@@ -56,25 +56,10 @@ Take special note of the **api_login** and **redirect_url** params hidden in the
 
 A note about test card data
 ----------------
-If you've just signed up and have not entered your billing information (or selected a Heroku paid plan), you will only be permitted to deal with test credit card data. Furthermore, we will outright reject any card data that doesn't correspond to the 8 numbers listed below.
-
-DO NOT USE REAL CREDIT CARD DATA UNTIL YOUR APPLICATION IS LIVE.
-
-* **Visa**
-	* Good Card - 4111111111111111
-	* Failed Card - 4012888888881881
-* **MasterCard**
-	* Good Card - 5555555555554444
-	* Failed Card - 5105105105105100
-* **American Express**
-	* Good Card - 378282246310005
-	* Failed Card - 371449635398431
-* **Discover**
-	* Failed Card - 6011111111111117
-	* Failed Card - 6011000990139424
+If you've just signed up and have not entered your billing information (or selected a Heroku paid plan), you will only be permitted to deal with [test credit card data](https://spreedlycore.com/manual/test-data).
 
 Once you've created your web form and submitted one of the test cards above, you should be returned to your app with a token identifier by which to identify your newly created payment method. Let's go ahead and look up that payment method by the token returned to your app, and we'll charge $5.50 to it.
- 
+
     payment_token = 'abc123' # extracted from the URL params
     payment_method = SpreedlyCore::PaymentMethod.find(payment_token)
     if payment_method.valid?
@@ -83,8 +68,6 @@ Once you've created your web form and submitted one of the test cards above, you
     else
       flash[:notice] = "Woops!\n" + payment_method.errors.join("\n")
     end
-    
-One final point to take note of is that Spreedly Core does no validation of the information passed in by the customer. We simply return them back to your application, and it's up to you to check for any errors in the payment method before charging against it.
 
 Saving Payment Methods
 ----------
@@ -97,27 +80,20 @@ Spreedly Core allows you to retain payment methods provided by your customer for
       retain_transaction = payment_method.retain
       retain_transaction.succeeded? # true
     end
-    
-Payment methods that you no longer want to retain can be redacted from Spreedly Core. Spreedly Core only charges for retained payment methods.
+
+Payment methods that you no longer want to retain can be redacted from Spreedly Core. A redacted payment method has its sensitive information removed.
 
     payment_token = 'abc123' # extracted from the URL params
     payment_method = SpreedlyCore::PaymentMethod.find(payment_token)
     redact_transaction = payment_method.redact
     redact_transaction.succeeded? # true
-    
+
 Usage Overview
 ----------
 Make a purchase against a payment method
 
     purchase_transaction = payment_method.purchase(1245)
-    
-Retain a payment method for future use
 
-    redact_transaction = payment_method.retain
-    
-Redact a previously retained payment method:
-
-    redact_transaction = payment_method.redact
 
 Make an authorize request against a payment method, then capture the payment
 
@@ -130,7 +106,7 @@ Make an authorize request against a payment method, then capture the payment
     authorize.succeeded? # true
     authorized.capture # Capture the full amount
     capture.succeeded? # true
-    
+
 Void a previous purchase:
 
     purchase_transaction.void # void the purchase
@@ -139,24 +115,24 @@ Credit (refund) a previous purchase:
 
     purchase_transaction = payment_method.purchase(100) # make a purchase
     purchase_transaction.credit
-    purchase_transaction.succeeded? # true 
+    purchase_transaction.succeeded? # true
 
 Credit part of a previous purchase:
 
     purchase_transaction = payment_method.purchase(100) # make a purchase
     purchase_transaction.credit(50) # provide a partial credit
-    purchase_transaction.succeeded? # true 
+    purchase_transaction.succeeded? # true
 
 
 Handling Exceptions
 --------
 There are 3 types of exceptions which can be raised by the library:
 
-1. SpreedlyCore::TimeOutError is raised if communication with Spreedly Core takes longer than 10 seconds     
+1. SpreedlyCore::TimeOutError is raised if communication with Spreedly Core takes longer than 10 seconds
 2. SpreedlyCore::InvalidResponse is raised when the response code is unexpected (I.E. we expect a HTTP response code of 200 bunt instead got a 500) or if the response does not contain an expected attribute. For example, the response from retaining a payment method should contain an XML attribute of "transaction". If this is not found (for example a HTTP response 404 or 500 is returned), then an InvalidResponse is raised.
 3. SpreedlyCore::UnprocessableRequest is raised when the response code is 422. This denotes a validation error where one or more of the data fields submitted were not valid, or the whole record was unable to be saved/updated. Inspection of the exception message will give an explanation of the issue.
 
-      
+
 Each of TimeOutError, InvalidResponse, and UnprocessableRequest subclass SpreedlyCore::Error.
 
 For example, let's look up a payment method that does not exist:
@@ -164,35 +140,10 @@ For example, let's look up a payment method that does not exist:
     begin
       payment_method = SpreedlyCore::PaymentMethod.find("NOT-FOUND")
     rescue SpreedlyCore::InvalidResponse => e
-      puts "Record does not exist"
       puts e.inspect
-    end  
+    end
 
-   
-Additional Field Validation
-----------
-The Spreely Core API provides validation of the credit card number, security code, and
-first and last name. In most cases this is enough; however, sometimes you may want to
-enforce the full billing information as well. The following example illustrates how this can be accomplished.
 
-    SpreedlyCore.configure
-    SpreedlyCore::PaymentMethod.additional_required_cc_fields :address1, :city, :state, :zip
-    
-    master_card_data = SpreedlyCore::TestHelper.cc_data(:master)
-    token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
-    
-    payment_method = SpreedlyCore::PaymentMethod.find(token)
-    payment_method.valid? # false
-    payment_method.errors # ["Address1 can't be blank", "City can't be blank", "State can't be blank", "Zip can't be blank"]
-    
-    master_card_data = SpreedlyCore::TestHelper.cc_data(:master, :credit_card => {:address1 => "742 Evergreen Terrace", :city => "Springfield", :state => "IL", 62701})
-    token = SpreedlyCore::PaymentMethod.create_test_token(master_card_data)
-    
-    payment_method = SpreedlyCore::PaymentMethod.find(token)
-    payment_method.valid? # returns true
-    payment_method.errors # []
-
-   
 Configuring SpreedlyCore for Use in Production (Rails example)
 ----------
 When you're ready for primetime, you'll need to complete a couple more steps to start processing real transactions.
@@ -203,38 +154,38 @@ When you're ready for primetime, you'll need to complete a couple more steps to 
 For this example, I will be using an Authorize.net account that only has a login and password credential.
 
     SpreedlyCore.configure
-    
+
     gateway = SpreedlyCore::Gateway.create(:login => 'my_authorize_login', :password => 'my_authorize_password', :gateway_type => 'authorize_net')
     gateway.use!
-    
+
     puts "Authorize.net gateway token is #{gateway.token}"
-    
+
 For most users, you will start off using only one gateway token, and as such can configure it as an environment variable to hold your gateway token. In addition to the previous environment variables, the `SpreedlyCore.configure` method will also look for a SPREEDLYCORE_GATEWAY_TOKEN environment value.
 
 	# create an initializer at config/initializers/spreedly_core.rb
     # values already set for ENV['SPREEDLYCORE_API_LOGIN'], ENV['SPREEDLYCORE_API_SECRET'], and ENV['SPREEDLYCORE_GATEWAY_TOKEN']
     SpreedlyCore.configure
-    
+
 If you wish to require additional credit card fields, the initializer is the best place to set this up.
 
     SpreedlyCore.configure
     SpreedlyCore::PaymentMethod.additional_required_cc_fields :address1, :city, :state, :zip
-    
+
 Using Multiple Gateways
 ------------
 For those using multiple gateway tokens, there is a class variable that holds the active gateway token. Before running any sort of transaction against a payment method, you'll need to set the gateway token that you wish to charge against.
 
     SpreedlyCore.configure
-    
+
     SpreedlyCore.gateway_token(paypal_gateway_token)
     SpreedlyCore::PaymentMethod.find(pm_token).purchase(550)
-    
+
     SpreedlyCore.gateway_token(authorize_gateway_token)
     SpreedlyCore::PaymentMethod.find(pm_token).purchase(2885)
-    
+
     SpreedlyCore.gateway_token(braintree_gateway_token)
     SpreedlyCore::PaymentMethod.find(pm_token).credit(150)
-    
+
 Creating Payment Types Programatically
 ------------
 **Please note that this practice requires you to be PCI compliant!**
@@ -248,14 +199,14 @@ In special cases, you may want to create payment types programmatically and will
 The example below illustrates both a successful payment method creation, and how to handle one with errors.
 
 	SpreedlyCore.configure
-	
+
 	pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => good_card_hash)
 	pm_token = pm_transaction.payment_method.token
 	puts "Payment method token is #{pm_token}"
-	
+
 	retain_transaction = pm_transaction.payment_method.retain
 	retain_transaction.succeeded? # true
-	
+
 	begin
       pm_transaction = SpreedlyCore::PaymentMethod.create(:credit_card => bad_card_hash)
     rescue Exception => e
