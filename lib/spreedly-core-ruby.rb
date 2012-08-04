@@ -1,7 +1,6 @@
 require 'set'
 
 require 'httparty'
-require 'active_support/core_ext/hash/conversions'
 
 require 'spreedly-core-ruby/base'
 require 'spreedly-core-ruby/payment_method'
@@ -21,9 +20,9 @@ module SpreedlyCore
   }
 
   class Error < RuntimeError; end
-  
+
   # Custom exception which occurs when a request to SpreedlyCore times out
-  # See SpreedlyCore::Base.default_timeout 
+  # See SpreedlyCore::Base.default_timeout
   class TimeOutError < Error; end
   class InvalidResponse < Error
     def initialize(response, message)
@@ -37,7 +36,7 @@ module SpreedlyCore
     def initialize(errors)
       errors = [errors] unless errors.is_a?(Array)
       @errors = errors
-      
+
       super(errors.join("\n"))
     end
   end
@@ -72,6 +71,8 @@ module SpreedlyCore
       Kernel.warn("This gem prefers only environment variables named SPREEDLYCORE_API_LOGIN, SPREEDLYCORE_API_SECRET, and optionally SPREEDLYCORE_GATEWAY_TOKEN.")
     end
 
+    options[:endpoint] ||= "https://spreedlycore.com/#{SpreedlyCore::API_VERSION}"
+
     if login.nil? || secret.nil?
       raise ArgumentError.new("You must provide a login and a secret. Gem will look for ENV['SPREEDLYCORE_API_LOGIN'] and ENV['SPREEDLYCORE_API_SECRET'], but you may also pass in a hash with :api_login and :api_secret keys.")
     end
@@ -93,6 +94,6 @@ module SpreedlyCore
   class Response < Base
     attr_reader(:success, :message, :avs_code, :avs_message, :cvv_code,
                 :cvv_message, :error_code, :error_detail, :created_at,
-                :updated_at) 
+                :updated_at)
   end
 end

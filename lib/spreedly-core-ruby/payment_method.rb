@@ -18,7 +18,7 @@ module SpreedlyCore
 
     # Lookup the PaymentMethod by token
     def self.find(token)
-      return nil if token.nil? 
+      return nil if token.nil?
       verify_get("/payment_methods/#{token}.xml",
                  :has_key => "payment_method") do |response|
         new(response.parsed_response["payment_method"])
@@ -82,13 +82,7 @@ module SpreedlyCore
       @errors.empty?
     end
 
-
-
-
-protected
-
-
-
+    protected
 
     # Validate additional cc fields like first_name, last_name, etc when
     # configured to do so
@@ -103,7 +97,7 @@ protected
                           else
                             str_field.split("_").join(" ")
                           end
-                            
+
           @errors << "#{friendly_name.capitalize} can't be blank"
         end
       end
@@ -119,7 +113,7 @@ protected
       path = "/gateways/#{_gateway_token}/#{transaction_type}.xml"
       data = {
         :transaction => {
-          :transaction_type => transaction_type, 
+          :transaction_type => transaction_type,
           :payment_method_token => token,
           :amount => amount,
           :currency_code => currency,
