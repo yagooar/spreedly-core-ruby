@@ -52,13 +52,13 @@ module SpreedlyCore
     end
 
     # Make a purchase against the payment method
-    def purchase(amount, currency=nil, _gateway_token=nil, ip_address=nil)
-      purchase_or_authorize(:purchase, amount, currency, _gateway_token, ip_address)
+    def purchase(amount, options={})
+      purchase_or_authorize(:purchase, amount, options)
     end
 
     # Make an authorize against payment method. You can then later capture against the authorize
-    def authorize(amount, currency=nil,  _gateway_token=nil, ip_address=nil)
-      purchase_or_authorize(:authorize, amount, currency, _gateway_token, ip_address)
+    def authorize(amount, options={})
+      purchase_or_authorize(:authorize, amount, options)
     end
 
     # Update the attributes of a payment method
@@ -104,12 +104,12 @@ module SpreedlyCore
       @errors = @errors.sort
     end
 
-    def purchase_or_authorize(tran_type, amount, currency, _gateway_token, ip_address)
+    def purchase_or_authorize(tran_type, amount, options)
       transaction_type = tran_type.to_s
       raise "Unknown transaction type" unless %w{purchase authorize}.include?(transaction_type)
 
-      currency ||= "USD"
-      _gateway_token ||= self.class.gateway_token
+      currency = (options[:currency] || "USD")
+      _gateway_token = (options[:gateway_token] || self.class.gateway_token)
       path = "/gateways/#{_gateway_token}/#{transaction_type}.xml"
       data = {
         :transaction => {
@@ -117,7 +117,9 @@ module SpreedlyCore
           :payment_method_token => token,
           :amount => amount,
           :currency_code => currency,
-          :ip => ip_address
+          :ip => options[:ip_address],
+          :redirect_url => options[:redirect_url],
+          :callback_url => options[:callback_url],
         }
       }
       self.class.verify_post(path, :body => data,

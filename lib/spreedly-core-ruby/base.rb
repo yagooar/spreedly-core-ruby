@@ -18,12 +18,14 @@ module SpreedlyCore
 
     def self.configure(login, secret, options = {})
       @@login = login
-      basic_auth(@@login, secret)
+      @@secret = secret
+      basic_auth(@@login, @@secret)
       base_uri options[:endpoint]
       @@gateway_token = options.delete(:gateway_token)
     end
 
     def self.login; @@login; end
+    def self.secret; @@secret; end
     def self.gateway_token; @@gateway_token; end
     def self.gateway_token=(gateway_token); @@gateway_token = gateway_token; end
 

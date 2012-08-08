@@ -4,8 +4,7 @@ module SpreedlyCore
     def self.get_or_create
       # get the list of gateways and return the first test gateway
       # if none exist, create one
-      gateways = Gateway.all
-      gateways.each do |g|
+      Gateway.all.each do |g|
         return g if g.gateway_type == "test" && g.redacted == false
       end
 
