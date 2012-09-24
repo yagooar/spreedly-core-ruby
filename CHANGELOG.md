@@ -1,3 +1,10 @@
+0.2.0 / September 24, 2012
+----------
+
+* Support all 3.x versions of ActiveSupport
+* Support all 0.x versions of HTTParty
+
+
 0.1.2 / February 29, 2012
 ----------
 
@@ -16,14 +23,14 @@
 * Allow configuring via a set of key/values or with the traditional 3 arguments.
   For example:
   SpreedlyCore.configure :login => 'login', :secret => 'secret', :token => 'token'
-   or 
+   or
   SpreeclyCore.configure 'login', 'secret', 'token'
 
 * Handle exceptional cases better. There are 2 types of exceptions which can be
   raised by the library:
-  1. SpreedlyCore::TimeOutError 
+  1. SpreedlyCore::TimeOutError
      A TimeOutError is raised if communication with SpreedlyCore takes longer
-     than 10 seconds     
+     than 10 seconds
   2. SpreedlyCore::InvalidResponse
      An InvalidResponse is raised when the response code is unexpected (I.E. we
      expect a HTTP response code of 200 bunt instead got a 500) or if the
