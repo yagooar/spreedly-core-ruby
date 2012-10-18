@@ -1,3 +1,8 @@
+0.2.1 / October 18, 2012
+----------
+
+* Fixed issue with create payment method API call.
+
 0.2.0 / September 24, 2012
 ----------
 
