@@ -1,3 +1,8 @@
+0.2.2 / October 18, 2012
+----------
+
+* Increased the timeout when talking to gateways.
+
 0.2.1 / October 18, 2012
 ----------
 
