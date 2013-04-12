@@ -6,25 +6,25 @@ module SpreedlyCore
     def test_configure
       old_verbose, $VERBOSE = $VERBOSE, nil
 
-      old_api_login = ENV['SPREEDLYCORE_API_LOGIN']
-      old_api_secret = ENV['SPREEDLYCORE_API_SECRET']
+      old_environment_key = ENV['SPREEDLYCORE_ENVIRONMENT_KEY']
+      old_access_secret = ENV['SPREEDLYCORE_ACCESS_SECRET']
       old_gateway_token = ENV['SPREEDLYCORE_GATEWAY_TOKEN']
-      ENV['SPREEDLYCORE_API_LOGIN'] = nil
-      ENV['SPREEDLYCORE_API_SECRET'] = nil
+      ENV['SPREEDLYCORE_ENVIRONMENT_KEY'] = nil
+      ENV['SPREEDLYCORE_ACCESS_SECRET'] = nil
       ENV['SPREEDLYCORE_GATEWAY_TOKEN'] = nil
 
       assert_nothing_raised ArgumentError do
-        SpreedlyCore.configure :api_login => "test",
-                               :api_secret => "secret",
+        SpreedlyCore.configure :environment_key => "test",
+                               :access_secret => "secret",
                                :gateway_token => "token"
       end
-  
+
       assert_raises ArgumentError do
         SpreedlyCore.configure
       end
 
-      ENV['SPREEDLYCORE_API_LOGIN'] = old_api_login
-      ENV['SPREEDLYCORE_API_SECRET'] = old_api_secret
+      ENV['SPREEDLYCORE_ENVIRONMENT_KEY'] = old_environment_key
+      ENV['SPREEDLYCORE_ACCESS_SECRET'] = old_access_secret
       ENV['SPREEDLYCORE_GATEWAY_TOKEN'] = 'any_value'
 
       SpreedlyCore.gateway_token = nil
@@ -37,6 +37,6 @@ module SpreedlyCore
     ensure
       $VERBOSE = old_verbose
     end
-    
+
   end
 end

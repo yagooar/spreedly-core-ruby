@@ -91,12 +91,12 @@ module SpreedlyCore
       @has_been_validated = true
       self.class.additional_required_cc_fields.each do |field|
         if instance_variable_get("@#{field}").blank?
-          str_field= field.to_s
-          friendly_name = if str_field.respond_to?(:humanize)
-                            str_field.humanize
-                          else
-                            str_field.split("_").join(" ")
-                          end
+          str_field = field.to_s
+          friendly_name = if(str_field.respond_to?(:humanize))
+            str_field.humanize
+          else
+            str_field.split("_").join(" ")
+          end
 
           @errors << "#{friendly_name.capitalize} can't be blank"
         end

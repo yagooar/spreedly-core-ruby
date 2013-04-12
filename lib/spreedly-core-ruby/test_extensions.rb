@@ -4,18 +4,18 @@ require 'uri'
 module SpreedlyCore
   module TestHelper
     extend self
-    
+
     def cc_data(cc_type, options={})
-    
+
       card_numbers = {:master => [5555555555554444, 5105105105105100],
         :visa => [4111111111111111, 4012888888881881],
         :american_express => [378282246310005, 371449635398431],
         :discover => [6011111111111117, 6011000990139424]
       }
-      
+
       card_number = options[:card_number] == :failed ? :last : :first
       number = card_numbers[cc_type].send(card_number)
-      
+
       { :credit_card => {
           :first_name => "John",
           :last_name => "Foo",
@@ -26,7 +26,7 @@ module SpreedlyCore
           :year => Time.now.year + 1 }.merge(options[:credit_card] || {})
       }
     end
-    
+
     # Return the base uri as a mocking framework would expect
     def mocked_base_uri_string
       uri = URI.parse(Base.base_uri)
@@ -38,9 +38,9 @@ module SpreedlyCore
   end
 
   class PaymentMethod
-    # Call spreedly core to create a test token.
+    # Call spreedly to create a test token.
     # pass_through_data will be added as the "data" field.
-    # 
+    #
     def self.create_test_token(cc_overrides = {})
       card = {
         :first_name => "John",

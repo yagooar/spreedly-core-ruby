@@ -1,5 +1,5 @@
 module SpreedlyCore
-  # Abstract class for all the different spreedly core transactions
+  # Abstract class for all the different spreedly transactions
   class Transaction < Base
     attr_reader(:amount, :on_test_gateway, :created_at, :updated_at, :currency_code,
                 :succeeded, :token, :message, :transaction_type, :gateway_token,

@@ -1,20 +1,20 @@
-SpreedlyCore
+Spreedly
 ======
-spreedly-core-ruby is a Ruby library for accessing the [Spreedly Core API](https://spreedlycore.com/). Spreedly Core is a Software-as-a-Service billing solution that serves two major functions for companies and developers.
+spreedly-core-ruby is a Ruby library for accessing the [Spreedly API](https://spreedly.com/). Spreedly is a Software-as-a-Service billing solution that serves two major functions for companies and developers.
 
-* First, it removes your [PCI Compliance](https://www.pcisecuritystandards.org/) requirement by pushing the card data handling and storage outside of your application. This is possible by having your customers POST their credit card info to the Spreedly Core service while embedding a transparent redirect URL back to your application (see "Submit payment form" on [the quick start guide](https://spreedlycore.com/manual/quickstart)).
+* First, it removes your [PCI Compliance](https://www.pcisecuritystandards.org/) requirement by pushing the card data handling and storage outside of your application. This is possible by having your customers POST their credit card info to the Spreedly service while embedding a transparent redirect URL back to your application (see "Submit payment form" on [the quick start guide](https://spreedly.com/manual/quickstart)).
 * Second, it removes any possibility of your gateway locking you in by owning your customer billing data (yes, this happens). By allowing you to charge any card against whatever gateways you as a company have signed up for, you retain all of your customer data and can switch between gateways as you please. Also, expanding internationally won't require an additional technical integration with yet another gateway.
 
 Credit where credit is due: our friends over at [403 Labs](http://www.403labs.com/) carried most of the weight in cutting the initial version of this gem, and we can't thank them enough for their work.
 
 Quickstart
 ----------
-Head over to the [Spreedly Core Website](https://www.spreedlycore.com) to sign up for an account. It's free to get started and play with test gateways/transactions using our specified test card data.
+Head over to the [Spreedly Website](https://www.spreedly.com) to sign up for an account. It's free to get started and play with test gateways/transactions using our specified test card data.
 
 RubyGems:
 
-    export SPREEDLYCORE_API_LOGIN=your_login_here
-    export SPREEDLYCORE_API_SECRET=your_secret_here
+    export SPREEDLYCORE_ENVIRONMENT_KEY=your_environment_key_here
+    export SPREEDLYCORE_ACCESS_SECRET=your_secret_here
     gem install spreedly-core-ruby
     irb
     require 'rubygems'
@@ -26,12 +26,12 @@ The first thing we'll need to do is set up a test gateway that we can run transa
     tg = SpreedlyCore::TestGateway.get_or_create
     tg.use!
 
-Now that you have a test gateway set up, we'll need to set up your payment form to post the credit card data directly to Spreedly Core. Spreedly Core will receive your customer's credit card data, and immediately transfer them back to the location you define inside the web payments form. The user won't know that they're being taken off site to record to the card data, and you as the developer will be left with a token identifier. The token identifier is used to make your charges against, and to access the customer's non-sensitive billing information.
+Now that you have a test gateway set up, we'll need to set up your payment form to post the credit card data directly to Spreedly. Spreedly will receive your customer's credit card data, and immediately transfer them back to the location you define inside the web payments form. The user won't know that they're being taken off site to record to the card data, and you as the developer will be left with a token identifier. The token identifier is used to make your charges against, and to access the customer's non-sensitive billing information.
 
-    <form action="https://spreedlycore.com/v1/payment_methods" method="POST">
+    <form action="https://core.spreedly.com/v1/payment_methods" method="POST">
 	    <fieldset>
 	        <input name="redirect_url" type="hidden" value="http://example.com/transparent_redirect_complete" />
-	        <input name="api_login" type="hidden" value="Ll6fAtoVSTyVMlJEmtpoJV8Shw5" />
+	        <input name="environment_key" type="hidden" value="Ll6fAtoVSTyVMlJEmtpoJV8Shw5" />
 	        <label for="credit_card_first_name">First name</label>
 	        <input id="credit_card_first_name" name="credit_card[first_name]" type="text" />
 
@@ -52,11 +52,11 @@ Now that you have a test gateway set up, we'll need to set up your payment form 
 	    </fieldset>
 	</form>
 
-Take special note of the **api_login** and **redirect_url** params hidden in the form, as Spreedly Core will use both of these fields to authenticate the developer's account and to send the customer back to the right location in your app.
+Take special note of the **environment_key** and **redirect_url** params hidden in the form, as Spreedly will use both of these fields to authenticate the developer's account and to send the customer back to the right location in your app.
 
 A note about test card data
 ----------------
-If you've just signed up and have not entered your billing information (or selected a Heroku paid plan), you will only be permitted to deal with [test credit card data](https://spreedlycore.com/manual/test-data).
+If you've just signed up and have not entered your billing information (or selected a Heroku paid plan), you will only be permitted to deal with [test credit card data](https://core.spreedly.com/manual/test-data).
 
 Once you've created your web form and submitted one of the test cards above, you should be returned to your app with a token identifier by which to identify your newly created payment method. Let's go ahead and look up that payment method by the token returned to your app, and we'll charge $5.50 to it.
 
@@ -71,7 +71,7 @@ Once you've created your web form and submitted one of the test cards above, you
 
 Saving Payment Methods
 ----------
-Spreedly Core allows you to retain payment methods provided by your customer for future use. In general, removing the friction from your checkout process is one of the best things you can do for your application, and using Spreedly Core will allow you to avoid making your customer input their payment details for every purchase.
+Spreedly allows you to retain payment methods provided by your customer for future use. In general, removing the friction from your checkout process is one of the best things you can do for your application, and using Spreedly will allow you to avoid making your customer input their payment details for every purchase.
 
     payment_token = 'abc123' # extracted from the URL params
     payment_method = SpreedlyCore::PaymentMethod.find(payment_token)
@@ -81,7 +81,7 @@ Spreedly Core allows you to retain payment methods provided by your customer for
       retain_transaction.succeeded? # true
     end
 
-Payment methods that you no longer want to retain can be redacted from Spreedly Core. A redacted payment method has its sensitive information removed.
+Payment methods that you no longer want to retain can be redacted from Spreedly. A redacted payment method has its sensitive information removed.
 
     payment_token = 'abc123' # extracted from the URL params
     payment_method = SpreedlyCore::PaymentMethod.find(payment_token)
@@ -128,7 +128,7 @@ Handling Exceptions
 --------
 There are 3 types of exceptions which can be raised by the library:
 
-1. SpreedlyCore::TimeOutError is raised if communication with Spreedly Core takes longer than 10 seconds
+1. SpreedlyCore::TimeOutError is raised if communication with Spreedly takes longer than 10 seconds
 2. SpreedlyCore::InvalidResponse is raised when the response code is unexpected (I.E. we expect a HTTP response code of 200 bunt instead got a 500) or if the response does not contain an expected attribute. For example, the response from retaining a payment method should contain an XML attribute of "transaction". If this is not found (for example a HTTP response 404 or 500 is returned), then an InvalidResponse is raised.
 3. SpreedlyCore::UnprocessableRequest is raised when the response code is 422. This denotes a validation error where one or more of the data fields submitted were not valid, or the whole record was unable to be saved/updated. Inspection of the exception message will give an explanation of the issue.
 
@@ -144,12 +144,12 @@ For example, let's look up a payment method that does not exist:
     end
 
 
-Configuring SpreedlyCore for Use in Production (Rails example)
+Configuring Spreedly for Use in Production (Rails example)
 ----------
 When you're ready for primetime, you'll need to complete a couple more steps to start processing real transactions.
 
-1. First, you'll need to get your business (or personal) payment details on file with Spreedly Core so that we can collect transaction and card retention fees. For those of you using Heroku, simply change your Spreedly Core addon to the paid tier.
-2. Second, you'll need to acquire a gateway that you can plug into the back of Spreedly Core. Any of the major players will work, and you're not at risk of lock-in because Spreedly Core happily plays middle man. Please consult our [list of supported gateways](https://www.spreedlycore.com/manual/gateways) to see exactly what information you'll need to pass to Spreedly Core when creating your gateway profile.
+1. First, you'll need to get your business (or personal) payment details on file with Spreedly so that we can collect transaction and card retention fees. For those of you using Heroku, simply change your Spreedly addon to the paid tier.
+2. Second, you'll need to acquire a gateway that you can plug into the back of Spreedly. Any of the major players will work, and you're not at risk of lock-in because Spreedly happily plays middle man. Please consult our [list of supported gateways](https://core.spreedly.com/manual/gateways) to see exactly what information you'll need to pass to Spreedly when creating your gateway profile.
 
 For this example, I will be using an Authorize.net account that only has a login and password credential.
 
@@ -163,7 +163,7 @@ For this example, I will be using an Authorize.net account that only has a login
 For most users, you will start off using only one gateway token, and as such can configure it as an environment variable to hold your gateway token. In addition to the previous environment variables, the `SpreedlyCore.configure` method will also look for a SPREEDLYCORE_GATEWAY_TOKEN environment value.
 
 	# create an initializer at config/initializers/spreedly_core.rb
-    # values already set for ENV['SPREEDLYCORE_API_LOGIN'], ENV['SPREEDLYCORE_API_SECRET'], and ENV['SPREEDLYCORE_GATEWAY_TOKEN']
+    # values already set for ENV['SPREEDLYCORE_ENVIRONMENT_KEY'], ENV['SPREEDLYCORE_ACCESS_SECRET'], and ENV['SPREEDLYCORE_GATEWAY_TOKEN']
     SpreedlyCore.configure
 
 If you wish to require additional credit card fields, the initializer is the best place to set this up.

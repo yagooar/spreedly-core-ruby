@@ -1,4 +1,4 @@
 module SpreedlyCore
-  Version = VERSION = "0.2.2"
+  Version = VERSION = "0.3.0"
   ApiVersion = API_VERSION = "v1"
 end

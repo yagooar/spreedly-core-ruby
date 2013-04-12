@@ -1,3 +1,11 @@
+0.3.0 / April 12, 2013
+----------
+
+* api_login -> environment_key
+* api_secret -> access_secret
+* spreedlycore.com -> core.spreedly.com
+* Fixed an issue with multiple errors in a PaymentMethod
+
 0.2.2 / October 18, 2012
 ----------
 

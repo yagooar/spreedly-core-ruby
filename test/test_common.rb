@@ -6,7 +6,7 @@ module SpreedlyCore
     include TestFactory
 
     def setup
-      raise "environment variables for SPREEDLYCORE_API_LOGIN and SPREEDLYCORE_API_SECRET must be set" unless ENV['SPREEDLYCORE_API_LOGIN'] && ENV['SPREEDLYCORE_API_SECRET']
+      raise "environment variables for SPREEDLYCORE_ENVIRONMENT_KEY and SPREEDLYCORE_ACCESS_SECRET must be set" unless ENV['SPREEDLYCORE_ENVIRONMENT_KEY'] && ENV['SPREEDLYCORE_ACCESS_SECRET']
 
       SpreedlyCore.configure
       unless SpreedlyCore.gateway_token

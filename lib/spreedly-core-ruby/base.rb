@@ -1,7 +1,7 @@
 require 'spreedly-core-ruby/version'
 
 module SpreedlyCore
-  # Base class for all SpreedlyCore API requests
+  # Base class for all Spreedly API requests
   class Base
     include HTTParty
 
@@ -14,14 +14,14 @@ module SpreedlyCore
     format :xml
     default_timeout 75
 
-    def self.configure(login, secret, options = {})
-      @@login = login
-      self.basic_auth(@@login, secret)
+    def self.configure(environment_key, secret, options = {})
+      @@environment_key = environment_key
+      self.basic_auth(@@environment_key, secret)
       base_uri options[:endpoint]
       @@gateway_token = options.delete(:gateway_token)
     end
 
-    def self.login; @@login; end
+    def self.environment_key; @@environment_key; end
     def self.gateway_token; @@gateway_token; end
     def self.gateway_token=(gateway_token); @@gateway_token = gateway_token; end
 
@@ -58,7 +58,7 @@ module SpreedlyCore
       begin
         response = self.send(request_type, path, options)
       rescue Timeout::Error, Errno::ETIMEDOUT => e
-        raise TimeOutError.new("Request to #{path} timed out. Is Spreedly Core down?")
+        raise TimeOutError.new("Request to #{path} timed out. Is Spreedly down?")
       end
 
       if allowed_codes.any? && !allowed_codes.include?(response.code)
@@ -87,13 +87,20 @@ module SpreedlyCore
         instance_variable_set("@#{k}", v)
       end
       # errors may be nil, empty, a string, or an array of strings.
-      @errors = if @errors.nil? || @errors["error"].blank?
-                  []
-                elsif @errors["error"].is_a?(String)
-                  [@errors["error"]]
-                else
-                  @errors["error"]
-                end
+      @errors = if(@errors.nil? || @errors["error"].blank?)
+        []
+      elsif @errors["error"].is_a?(String)
+        [@errors["error"]]
+      else
+        @errors["error"].collect do |error|
+          case error
+          when Hash
+            error["__content__"]
+          else
+            error
+          end
+        end
+      end
     end
   end
 end
